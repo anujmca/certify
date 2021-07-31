@@ -1,0 +1,25 @@
+# asgiref==3.4.1
+# boto3==1.16.44
+# botocore==1.19.44
+# compress-json==1.0.4
+# Django==3.2.5
+# jmespath==0.10.0
+# numpy==1.20.2
+# pandas==1.2.3
+# py4j==0.10.9
+# pyaes==1.6.1
+# pyasn1==0.4.8
+# pyspark==3.0.1
+# python-dateutil==2.8.1
+# pytz==2021.1
+# rsa==4.7.2
+# s3transfer==0.3.3
+# six==1.15.0
+# sqlparse==0.4.1
+# Telethon==1.21.1
+# ujson==4.0.1
+# urllib3==1.26.2
+python-pptx==0.6.19
+# xlrd==2.0.1
+openpyxl==3.0.7
+django-tables2==2.4.0

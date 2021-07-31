@@ -1,4 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-        Templates
+        {% for template in templates %}
+        <div class="card" style="width: 18rem;margin-right:10px;float:left;">
+          <img src="/static/img/certificate_frame.png" class="card-img-top">
+          <div class="card-body">
+            <h5 class="card-title">{{ template.name }}</h5>
+            <p class="card-text">{{ template.description }}</p>
+            <form method="post" action="/services/certificates/generate">
+                {% csrf_token %}
+                <input type="hidden" id="templateId" name="templateId" value="{{ template.id }}">
+                <input type="hidden" id="dataSheetId" name="dataSheetId" value="{{ template.id }}">
+                <button class="w-100 btn btn-lg btn-dark" type="submit">Generate Certificates</button>
+            </form>
+{#            <a href="#" class="btn btn-primary">Generate Certificates</a>#}
+{#            <!-- Button trigger modal -->#}
+{#            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">#}
+{#              Launch demo modal#}
+{#            </button>#}
+          </div>
+
+        </div>
+        {% endfor %}
+
+
+{#        <!-- Modal -->#}
+{#        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">#}
+{#          <div class="modal-dialog">#}
+{#            <div class="modal-content">#}
+{#              <div class="modal-header">#}
+{#                <h5 class="modal-title" id="exampleModalLabel">Choose</h5>#}
+{#                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+{#              </div>#}
+{#              <div class="modal-body">#}
+{#                ...#}
+{#              </div>#}
+{#              <div class="modal-footer">#}
+{#                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>#}
+{#                <button type="button" class="btn btn-primary">Save changes</button>#}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+
 {% endblock %}

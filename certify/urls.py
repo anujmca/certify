@@ -25,5 +25,10 @@ urlpatterns = [
 
     path('templates', views.templates, name='templates'),
     path('certificates', views.certificates, name='certificates'),
+    # path('certificates', views.CertificateTableView, name='certificates'),
     path('employees', views.employees, name='employees'),
 ]
+
+from django.conf.urls.static import static
+from certify import settings
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

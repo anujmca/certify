@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
+from services.models import *
+
 
 def login(request):
     next_url = request.GET.get('next')
@@ -21,7 +23,8 @@ def index(request):
 
 @login_required
 def templates(request):
-    context = {'content_title': 'Templates'}
+    context = {'content_title': 'Templates',
+               'templates': Template.objects.all()}
     return render(request, 'templates.html', context)
 
 
@@ -33,5 +36,12 @@ def employees(request):
 
 @login_required
 def certificates(request):
-    context = {'content_title': 'Certificates'}
+    context = {'content_title': 'Certificates',
+               'certificates': Certificate.objects.all()}
     return render(request, 'certificates.html', context)
+
+
+# class CertificateTableView(tables.SingleTableView):
+#     table_class = CertificateTable
+#     queryset = Certificate.objects.all()
+#     template_name = "certificates.html"

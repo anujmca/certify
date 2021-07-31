@@ -1,4 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-        Certificates
+    {% load static %}
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Template</th>
+      <th scope="col">Batch ID</th>
+      <th scope="col">Data Keys</th>
+      <th scope="col">Certificate</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for certificate in certificates %}
+    <tr>
+      <th scope="row">{{ certificate.id }}</th>
+      <td>{{ certificate.template.name }}</td>
+      <td>{{ certificate.batch_id }}</td>
+      <td>
+          {% for data_key in certificate.data_keys.all %}
+              {{ data_key.name }}: {{ data_key.value }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+      </td>
+      <td>
+{#          <a href="/services/certificates/download/{{ certificate.file }}">#}
+{#              {{ certificate.file }}</a>#}
+          <a href="{{ MEDIA_URL }}{{ certificate.file }}" download>{{ certificate.file }}</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{#    {% load render_table from django_tables2 %}#}
+{#    {% render_table table %}#}
 {% endblock %}
