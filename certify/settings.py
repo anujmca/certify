@@ -24,11 +24,27 @@ SECRET_KEY = 'django-insecure-5i7h241^@n$+6m@(psq@k+u!*^gi9vtz#d+i!oc1s*qn#d*#p@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['certify.com', '.certify.com']
 
 # Application definition
 
-INSTALLED_APPS = [
+
+SHARED_APPS = [
+    'django_tenants',  # mandatory
+
+    # 'django.contrib.admin',
+    # 'django.contrib.auth',
+    # 'django.contrib.contenttypes',
+    # 'django.contrib.sessions',
+    # 'django.contrib.messages',
+    # 'django.contrib.staticfiles',
+
+    # 'services',
+    # 'django_tables2',
+    'tenant'
+]
+
+TENANT_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,10 +53,20 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'services',
-    'django_tables2'
+    'django_tables2',
+    # 'tenant'
 ]
 
+
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+TENANT_MODEL = "tenant.Client"  # app.Model
+
+TENANT_DOMAIN_MODEL = "tenant.Domain"  # app.Model
+
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
+    'certify.middleware.CustomAuthenticationBackend',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,6 +75,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# AUTHENTICATION_BACKENDS=['certify.middleware.CustomAuthenticationBackend',]
+
 
 ROOT_URLCONF = 'certify.urls'
 
@@ -66,6 +95,10 @@ TEMPLATES = [
                 'django.template.context_processors.media',  # set this explicitly
 
             ],
+            'libraries': {
+                'tags': 'certify.tags',
+
+            }
         },
     },
 ]
@@ -77,10 +110,18 @@ WSGI_APPLICATION = 'certify.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django_tenants.postgresql_backend',
+        'NAME': 'certify',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -133,3 +174,6 @@ LOGIN_URL = '/login'
 MEDIA_DIR = os.path.join(BASE_DIR,'media')
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
+
+# AUTH_USER_MODEL = 'services.CertifyUser'
+

@@ -1,38 +1,71 @@
-import mimetypes
 from io import StringIO, BytesIO
-# from wsgiref.util import FileWrapper
-
 from django.contrib.auth import authenticate, logout as django_logout, login as django_login
-
+from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.utils.encoding import smart_str
 from pandas import *
-# import generators.pptx_generator
+
+from certify.middleware import CustomAuthenticationBackend
 from generators import pptxGenerator as generator
-from certify import settings
-from django.http import HttpResponse
-
-from django.contrib.auth.models import User
-
-from typing import Optional
-import os
-
 from services.models import *
+from random import randint
+from twilio.rest import Client as TwilioClient
+from datetime import timezone
+import datetime
 
 
 def login(request):
     if request.method == "POST":
-        email = request.POST['email']
-        password = request.POST['password']
+        email_or_phone = request.POST['email_or_phone']
+        if 'sign-in' in request.POST:
+            password = request.POST['password']
 
-        # check if user has entered correct credentials
-        user = authenticate(username=email, password=password)
-        if user is not None and user.is_authenticated:
-            django_login(request, user)
-            next_url = request.GET.get('next')
-            return redirect(next_url if next_url else '/')
-        else:
-            return redirect('/login')
+            # check if user has entered correct credentials
+            # user = authenticate(request=request, email_or_phone=email_or_phone, password=password)
+            authBackend = CustomAuthenticationBackend()
+            user = authBackend.authenticate(request=request, email_or_phone=email_or_phone, password=password)
+
+            if user is not None and user.is_authenticated:
+                django_login(request, user)
+                next_url = request.GET.get('next')
+                return redirect(next_url if next_url else '/')
+            else:
+                return redirect('/login')
+
+        elif 'request-otp' in request.POST:
+            otp = randint(1000, 9999)
+
+            # account_sid = 'AC11de2df9f81f5b40d469bd0c8b5ccfd7'
+            # auth_token = '9d53e967ffb87caa796c733f90ecd1ab'
+            # client = TwilioClient(account_sid, auth_token)
+            # message = client.messages.create(
+            #     body=f'{otp} is your OTP for certify, valid for next 15 minutes',
+            #     from_='+12512418305',
+            #     to=email_or_phone
+            # )
+
+            dt = datetime.datetime.now(timezone.utc)
+            utc_time = dt.replace(tzinfo=timezone.utc)
+
+            user = User.objects.get(Q(email=email_or_phone) | Q(profile__phone_number=email_or_phone))
+            user.profile.otp = otp
+            user.profile.otp_valid_till = utc_time + datetime.timedelta(minutes=1)
+            user.profile.save()
+
+            context = {'otp_sent': True}
+            return redirect('/login', context)
+        elif 'verify-otp' in request.POST:
+            otp = request.POST['otp']
+            authBackend = CustomAuthenticationBackend()
+            user = authBackend.authenticate(request=request, email_or_phone=email_or_phone, otp=otp)
+
+            if user is not None and user.is_authenticated:
+                django_login(request, user)
+                next_url = request.GET.get('next')
+                return redirect(next_url if next_url else '/')
+            else:
+                return redirect('/login')
+
+
 
 
 def logout(request):
@@ -77,3 +110,6 @@ def generate_certificate(request):
             certificate.save()
 
         return redirect('/certificates')
+
+
+

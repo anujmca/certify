@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Certify | Login</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="{% static 'css/lib/bootstrap.min.css' %}" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <style>
       .bd-placeholder-img {
@@ -23,9 +23,69 @@
           font-size: 3.5rem;
         }
       }
+
+    .partitioned {
+        padding-left: 15px;
+        letter-spacing: 42px;
+        border: 0;
+        background-image: linear-gradient(to left, black 70%, rgba(255, 255, 255, 0) 0%);
+        background-position: bottom;
+        background-size: 50px 1px;
+        background-repeat: repeat-x;
+        background-position-x: 35px;
+        width: 220px;
+        min-width: 220px;
+        background-color: #f5f5f5;
+    }
+    #divInner{
+      left: 0;
+      position: sticky;
+    }
+
+    #divOuter{
+      width: 190px;
+      overflow: hidden;
+    }
+
+
+    {#input:focus, textarea:focus, select:focus{#}
+    {#    outline: none;#}
+    {#}#}
+    .no-focus{
+        outline: none;
+    }
     </style>
     <!-- Custom styles for this template -->
-    <link href="../static/css/signin.css" rel="stylesheet">
+    <link href="{% static 'css/signin.css'%}" rel="stylesheet">
+    <script>
+      function getCodeBoxElement(index) {
+        return document.getElementById('codeBox' + index);
+      }
+      function onKeyUpEvent(index, event) {
+        const eventCode = event.which || event.keyCode;
+        if (getCodeBoxElement(index).value.length === 1) {
+          if (index !== 4) {
+            getCodeBoxElement(index+ 1).focus();
+          } else {
+            getCodeBoxElement(index).blur();
+            // Submit code
+            console.log('submit code ');
+          }
+        }
+        if (eventCode === 8 && index !== 1) {
+          getCodeBoxElement(index - 1).focus();
+        }
+      }
+      function onFocusEvent(index) {
+        for (item = 1; item < index; item++) {
+          const currentElement = getCodeBoxElement(item);
+          if (!currentElement.value) {
+              currentElement.focus();
+              break;
+          }
+        }
+      }
+    </script>
   </head>
   <body class="text-center">
     <main class="form-signin">
@@ -35,8 +95,8 @@
         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
         <div class="form-floating">
-          <input type="email" class="form-control" name="email" id="inputEmail" placeholder="name@example.com">
-          <label for="inputEmail">Email address</label>
+          <input class="form-control" name="email_or_phone" id="inputEmail" placeholder="name@example.com or +919313499294">
+          <label for="inputEmail">Email or Phone</label>
         </div>
         <div class="form-floating">
           <input type="password" class="form-control" name="password" id="inputPassword" placeholder="Password">
@@ -48,9 +108,32 @@
             <input type="checkbox" value="remember-me"> Remember me
           </label>
         </div>
-        <button class="w-100 btn btn-lg btn-dark" type="submit">Sign in</button>
-        <p class="mt-5 mb-3 text-muted">&copy; 2021–2022</p>
+        <button class="w-100 btn btn-lg btn-dark" name="sign-in" type="submit">Sign in</button>
+        <br><br>
+        or
+        <br>
+        <br>
+        <button class="w-100 btn btn-lg btn-dark" name="request-otp" type="submit">Request OTP</button>
+        <br><br>
+        <div class="form-floating">
+            <div id="divOuter" style="margin:auto">
+                <div id="divInner">
+                    <input class="partitioned no-focus" name="otp" id="inputOtp" minlength="4" maxlength="4" autocomplete="off"
+                        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  onKeyPress="if(this.value.length==4) return false;"
+                    >
+                </div>
+            </div>
+        </div>
+{#          <div class="form-floating">#}
+{#            <input id="codeBox1" type="number" maxlength="1" onkeyup="onKeyUpEvent(1, event)" onfocus="onFocusEvent(1)"/>#}
+{#            <input id="codeBox2" type="number" maxlength="1" onkeyup="onKeyUpEvent(2, event)" onfocus="onFocusEvent(2)"/>#}
+{#            <input id="codeBox3" type="number" maxlength="1" onkeyup="onKeyUpEvent(3, event)" onfocus="onFocusEvent(3)"/>#}
+{#            <input id="codeBox4" type="number" maxlength="1" onkeyup="onKeyUpEvent(4, event)" onfocus="onFocusEvent(4)"/>#}
+{#          </div>#}
+        <br>
+        <button class="w-100 btn btn-lg btn-dark" name="verify-otp" type="submit">Verify</button>
       </form>
+        <p class="mt-5 mb-3 text-muted">&copy; 2021–2022</p>
     </main>
   </body>
 </html>

@@ -14,9 +14,10 @@ def generate(template_file_path, data_sheet_dictionary):
     slide = ppt.slides[0]
     for shape in ppt.slides[0].shapes:
         if hasattr(shape, 'text') and shape.text.lower() in data_sheet_dictionary:
-            shape.text = data_sheet_dictionary[shape.text.lower()]
+            # shape.text = data_sheet_dictionary[shape.text.lower()]
+            shape.text_frame.paragraphs[0].runs[0].text = data_sheet_dictionary[shape.text.lower()]
 
-    # ppt.save(data_sheet_dictionary['employee_name'] + ".pptx")
+            # ppt.save(data_sheet_dictionary['employee_name'] + ".pptx")
     return ppt
 
 
@@ -28,7 +29,10 @@ def generate_in_memory(template_file, data_sheet_dictionary):
     slide = ppt.slides[0]
     for shape in ppt.slides[0].shapes:
         if hasattr(shape, 'text') and shape.text.lower() in data_sheet_dictionary:
-            shape.text = data_sheet_dictionary[shape.text.lower()]
+            orig_text = shape.text
+
+            # shape.text = data_sheet_dictionary[shape.text.lower()]
+            shape.text = orig_text.replace(shape.text, str(data_sheet_dictionary[shape.text.lower()]))
 
     # ppt.save(data_sheet_dictionary['employee_name'] + ".pptx")
     return ppt

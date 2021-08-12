@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 
 from services.models import *
 
-
 def login(request):
     next_url = request.GET.get('next')
     context = None if next_url is None else {'next' : next_url}
