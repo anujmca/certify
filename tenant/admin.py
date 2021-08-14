@@ -9,4 +9,5 @@ class ClientAdmin(TenantAdminMixin, admin.ModelAdmin):
     # list_display = ('name', 'paid_until')
     pass
 
+
 admin.site.register(Domain)

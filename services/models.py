@@ -13,8 +13,12 @@ class BaseModel(models.Model):
 
     created_on = models.DateTimeField(auto_now_add=True, db_index=True, editable=False,
                                       help_text='Datetime on which this record was created.')
-    modified_on = models.DateTimeField(auto_now=True, null=True, blank=True, editable=False,
+    updated_on = models.DateTimeField(auto_now=True, null=True, blank=True, editable=False,
                                        help_text='Datetime on which this record was last modified.')
+
+    created_by = models.ForeignKey(User, null=False, related_name='%(class)s_created', on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(User, null=True, blank=True, related_name='%(class)s_updated',
+                                   on_delete=models.CASCADE)
 
 
 class Profile(models.Model):
@@ -28,8 +32,6 @@ class Profile(models.Model):
 
 
 class Template(BaseModel):
-    created_by = models.ForeignKey(User, related_name="templates_created", null=False, on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, related_name="templates_updated", null=True, blank=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=400, null=True)
     # data_sheet = models.FileField(upload_to='data_sheets/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/data_sheets/2015/01/30
@@ -42,11 +44,13 @@ class Template(BaseModel):
 class DataSheet(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=400, null=True)
-    data_sheet = models.FileField(upload_to='data_sheets/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/data_sheets/2015/01/30
+    data_sheet = models.FileField(
+        upload_to='data_sheets/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/data_sheets/2015/01/30
     template = models.ForeignKey(Template, related_name="data_sheet", null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+
 
 class DataKey(models.Model):
     name = models.CharField(max_length=50, null=False, unique=False)
@@ -55,14 +59,25 @@ class DataKey(models.Model):
     def __str__(self):
         return self.name
 
+
 class Certificate(models.Model):
     created_by = models.ForeignKey(User, related_name="certificate_created", null=True, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, related_name="certificates", null=True, on_delete=models.CASCADE)
     batch_id = models.IntegerField()
     data_keys = models.ManyToManyField(DataKey, related_name="certificates")
-    file = models.FileField(upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
+    file = models.FileField(
+        upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
 
-#
+
+class Event(BaseModel):
+    template = models.ForeignKey(Template, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
+    datasheet = models.ForeignKey(DataSheet, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.template) + ' - ' + str(self.datasheet)
+
+
+
 # import django_tables2 as tables
 #
 # class CertificateTable(tables.Table):

@@ -66,8 +66,6 @@ def login(request):
                 return redirect('/login')
 
 
-
-
 def logout(request):
     if request.user is not None and request.user.is_authenticated:
         django_logout(request)
