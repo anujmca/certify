@@ -14,6 +14,7 @@ class DataSheetSerializer(serializers.ModelSerializer):
         model = DataSheet
         fields = '__all__'
 
+
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template

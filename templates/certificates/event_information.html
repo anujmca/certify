@@ -1,0 +1,10 @@
+<div class="form-card">
+    <h2 class="fs-title">Event Information</h2>
+    <div name="event_id" id="event_id" class="title-hint" disabled {% if event == None %}hidden{% endif %}>Event Id:
+        <span>"{% if event != None %}{{ event.id }}{% endif %}"</span>
+    </div>
+    <input type="hidden" name="id" id="id" value="{% if event != None %}{{ event.id }}{% endif %}" />
+    <input type="text" name="name" id="name" placeholder="Name" value="{% if event != None %}{{ event.name }}{% endif %}" />
+    <input type="text" name="awarded_by" id="awarded_by" placeholder="Awarded By" value="{% if event != None %}{{ event.awarded_by }}{% endif %}"/>
+</div>
+<input type="button" name="next" class="next action-button" value="Next Step" onclick="event_information_save()" />

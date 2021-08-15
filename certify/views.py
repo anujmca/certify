@@ -43,9 +43,12 @@ def certificates(request):
 
 
 @login_required
-def certificates_setup(request):
+def certificates_setup(request, pk=None):
+    event = Event.objects.get(pk=pk) if pk is not None else None
     context = {'content_title': settings.CONTENT_TITLE.CERTIFICATE_SETUP,
-               'certificates': Certificate.objects.all()}
+               'event': event,
+               'templates': Template.objects.all(),
+               'datasheets': DataSheet.objects.all(), }
     return render(request, r'certificates\certificate_setup.html', context)
 
 

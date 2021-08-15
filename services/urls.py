@@ -15,5 +15,8 @@ urlpatterns = [
 
     path('events/', views_restful.EventList.as_view()),
     path('events/<int:pk>/', views_restful.EventDetail.as_view()),
+
+    path('templates/', views_restful.TemplateList.as_view()),
+    path('templates/<int:pk>/', views_restful.TemplateDetail.as_view()),
 ]
 
