@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.contrib.auth.models import User
@@ -14,14 +16,16 @@ class BaseModel(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, db_index=True, editable=False,
                                       help_text='Datetime on which this record was created.')
     updated_on = models.DateTimeField(auto_now=True, null=True, blank=True, editable=False,
-                                       help_text='Datetime on which this record was last modified.')
+                                      help_text='Datetime on which this record was last modified.')
 
-    created_by = models.ForeignKey(User, null=False, related_name='%(class)s_created', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, null=True, related_name='%(class)s_created', on_delete=models.CASCADE)
     updated_by = models.ForeignKey(User, null=True, blank=True, related_name='%(class)s_updated',
                                    on_delete=models.CASCADE)
 
+    is_deleted = models.BooleanField(null=False, default=False)
 
-class Profile(models.Model):
+
+class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     phone_number = models.CharField(max_length=100, null=False, unique=True)
     otp = models.CharField(max_length=10, null=True, blank=True, unique=False, )
@@ -41,7 +45,7 @@ class Template(BaseModel):
         return self.name
 
 
-class DataSheet(models.Model):
+class DataSheet(BaseModel):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=400, null=True)
     data_sheet = models.FileField(
@@ -52,7 +56,7 @@ class DataSheet(models.Model):
         return self.name
 
 
-class DataKey(models.Model):
+class DataKey(BaseModel):
     name = models.CharField(max_length=50, null=False, unique=False)
     value = models.CharField(max_length=200, null=False, unique=False)
 
@@ -60,7 +64,7 @@ class DataKey(models.Model):
         return self.name
 
 
-class Certificate(models.Model):
+class Certificate(BaseModel):
     created_by = models.ForeignKey(User, related_name="certificate_created", null=True, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, related_name="certificates", null=True, on_delete=models.CASCADE)
     batch_id = models.IntegerField()
@@ -70,11 +74,13 @@ class Certificate(models.Model):
 
 
 class Event(BaseModel):
+    name = models.CharField(max_length=100, null=False)
+    awarded_by = models.CharField(max_length=100, null=False)
     template = models.ForeignKey(Template, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
     datasheet = models.ForeignKey(DataSheet, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.template) + ' - ' + str(self.datasheet)
+        return self.name
 
 
 

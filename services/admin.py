@@ -18,7 +18,6 @@ class BaseAdmin(admin.ModelAdmin):
 
 class TemplateAdmin(admin.ModelAdmin):
     model = Template
-    # readonly_fields = ('created_on', 'modified_on')
 
 
 class DataSheetAdmin(admin.ModelAdmin):

@@ -82,7 +82,8 @@ def generate_certificate(request):
         data_sheet_excel = ExcelFile(dataSheet.data_sheet)
         df = data_sheet_excel.parse(data_sheet_excel.sheet_names[0])
 
-        latest_batch_id = 0 if not Certificate.objects.exists() else Certificate.objects.order_by('-batch_id')[0].batch_id
+        latest_batch_id = 0 if not Certificate.objects.exists() else Certificate.objects.order_by('-batch_id')[
+            0].batch_id
         batch_id = 1 if latest_batch_id is None else latest_batch_id + 1
         for i, row in df.iterrows():
             data_sheet_dictionary = {}
@@ -100,7 +101,6 @@ def generate_certificate(request):
             target_stream = BytesIO()
             certificate_file.save(target_stream)
 
-
             certificate = Certificate(batch_id=batch_id, template=template)
             certificate.save()
             certificate.data_keys.set(data_keys)
@@ -108,6 +108,3 @@ def generate_certificate(request):
             certificate.save()
 
         return redirect('/certificates')
-
-
-

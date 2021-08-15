@@ -26,6 +26,8 @@ urlpatterns = [
     path('templates', views.templates, name='templates'),
     path('certificates', views.certificates, name='certificates'),
     # path('certificates', views.CertificateTableView, name='certificates'),
+    path('certificates/setup', views.certificates_setup, name='certificates_setup'),
+    path('certificates/generate', views.certificates_generate, name='certificates_generate'),
     path('employees', views.employees, name='employees'),
 ]
 

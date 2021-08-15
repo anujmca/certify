@@ -1,0 +1,19 @@
+#progressbar #event:before {
+    font-family: FontAwesome;
+    content: "\f016"
+}
+
+#progressbar #template:before {
+    font-family: FontAwesome;
+    content: "\f008"
+}
+
+#progressbar #datasheet:before {
+    font-family: FontAwesome;
+    content: "\f0ce"
+}
+
+#progressbar #confirm:before {
+    font-family: FontAwesome;
+    content: "\f00c"
+}

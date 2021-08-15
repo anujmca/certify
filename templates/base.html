@@ -54,31 +54,45 @@
           <div class="position-sticky pt-3">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link {% if content_title == "Dashboard" %}active{% endif %}" aria-current="page" href="/">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.DASHBOARD %}active{% endif %}" aria-current="page" href="/">
                   <span data-feather="home"></span>
                   Dashboard
                 </a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link {% if content_title == "Templates" %}active{% endif %}" href="/templates">
+              <li class="nav-item border-top">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.TEMPLATES %}active{% endif %}" href="/templates">
                   <span data-feather="file"></span>
                   Templates
                 </a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link {% if content_title == "Certificates" %}active{% endif %}" href="/certificates">
+              <li class="nav-item border-top">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATES %}active{% endif %}" href="/certificates">
                   <span data-feather="layers"></span>
                   Certificates
                 </a>
+                <ul class="nav-item flex-column">
+                  <li class="nav-item">
+                    <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATE_SETUP %}active{% endif %}" aria-current="page" href="/certificates/setup">
+                      <span data-feather="file-plus"></span>
+                      Setup a new Event
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATE_GENERATE %}active{% endif %}" aria-current="page" href="/certificates/generate">
+                      <span data-feather="cpu"></span>
+                      Generate Certificates
+                    </a>
+                  </li>
+                </ul>
               </li>
-              <li class="nav-item">
-                <a class="nav-link {% if content_title == "Employees" %}active{% endif %}"  href="/employees">
+              <li class="nav-item border-top">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.EMPLOYEES %}active{% endif %}"  href="/employees">
                   <span data-feather="users"></span>
                   Employees
                 </a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link {% if content_title == "Reports" %}active{% endif %}"  href="#">
+              <li class="nav-item border-top">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.REPORTS %}active{% endif %}"  href="#">
                   <span data-feather="bar-chart-2"></span>
                   Reports
                 </a>
