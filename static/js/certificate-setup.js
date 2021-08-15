@@ -1,4 +1,5 @@
-let url_events = '/services/events/';
+let url_events = '/services/events/',
+    url_templates = '/services/templates/';
 
 function event_information_save()
 {
@@ -29,6 +30,56 @@ function event_information_save()
     });
 }
 
+function template_save(){
+    let id = ($('#template_id').length ? $('#template_id').val() : ''),
+        name = $('#template_name').val(),
+        description = $('#template_description').val();
+
+    let isNew = (!id || id == '' || id == undefined);
+
+    // if( $('#template_id').length )
+    //     id = $('#template_id').val(),
+
+    // payload={'name': name, 'description': description}
+
+    let fd = new FormData();
+    let files = $('#event_template_file')[0].files;
+
+    // Check file selected or not
+    if(files.length > 0 )
+       fd.append('file',files[0]);
+
+    fd.append('name', name);
+    fd.append('description', description);
+
+    let url = url_templates + (isNew ? '' : id + '/');
+
+    $.ajax({
+        async: false,
+        url: url,
+        // dataType: 'JSON',
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: isNew ? 'POST' : 'PATCH',
+        data: fd,
+        success:function(data){
+            console.log(data);
+            id = data.id;
+            // let id = $('#template_id').val();
+            // let wasNew = (!id || id == '' || id == undefined);
+            // if(wasNew) {
+            //     $('#template_id').val(data.id);
+            //     $('#event_id span').text(data.id);
+            //     $('#event_id').removeAttr('hidden');
+            // }
+        }
+    });
+
+    return id;
+}
+
+
 function event_template_save()
 {
     let selected_existing_template_id = $('input[name=existing-template]:checked').val(),
@@ -38,8 +89,12 @@ function event_template_save()
     if (selected_existing_template_id != '' && selected_existing_template_id != undefined) {
         template_id = selected_existing_template_id;
     }
+    else{
+        template_id = template_save();
+        alert('template_id: ' + template_id);
+    }
 
-    payload={'template_id': template_id}
+    let payload={'template_id': template_id}
     let url = url_events + event_id + '/';
 
     $.ajax({
