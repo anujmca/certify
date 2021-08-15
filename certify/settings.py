@@ -59,7 +59,6 @@ TENANT_APPS = [
     'rest_framework',
 ]
 
-
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 TENANT_MODEL = "tenant.Client"  # app.Model
@@ -173,35 +172,39 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login'
 
-MEDIA_DIR = os.path.join(BASE_DIR,'media')
+MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
 
 # AUTH_USER_MODEL = 'services.CertifyUser'
 
 
-
-#region CUSTOM CONSTANTS
+# region CUSTOM CONSTANTS
 from types import SimpleNamespace
+
 CONTENT_TITLE = SimpleNamespace(**{
-        'DASHBOARD': 'Dashboard',
-        'TEMPLATES': 'Templates',
-        'CERTIFICATES': 'Certificates',
-        'CERTIFICATE_SETUP': 'Certificate Setup',
-        'CERTIFICATE_GENERATE': 'Certificate Generate',
-        'EMPLOYEES': 'Employees',
-        'REPORTS': 'Reports',
-       })
-#endregion
+    'DASHBOARD': 'Dashboard',
+    'TEMPLATES': 'Templates',
+    'CERTIFICATES': 'Certificates',
+    'CERTIFICATE_SETUP': 'Certificate Setup',
+    'CERTIFICATE_GENERATE': 'Certificate Generate',
+    'EMPLOYEES': 'Employees',
+    'REPORTS': 'Reports',
+})
+# endregion
 
 
 REST_FRAMEWORK = {
+
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework.authentication.TokenAuthentication',
+    #     # 'rest_framework.authentication.SessionAuthentication',
+    # ]
 }
-
-REST_FRAMEWORK = {
-'DEFAULT_PERMISSION_CLASSES': (
-    'rest_framework.permissions.IsAuthenticated',
-)
-}
+# APPEND_SLASH = True

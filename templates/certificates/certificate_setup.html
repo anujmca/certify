@@ -4,6 +4,7 @@
 <link href="{% static 'css/wizard.css'%}" rel="stylesheet">
 <link href="{% static 'css/certificate-setup.css'%}" rel="stylesheet">
 <script src="{% static 'js/wizard.js' %}"></script>
+<script src="{% static 'js/certificate-setup.js' %}"></script>
 {#<link href="{% static 'css/lib/font-awesome' %}" rel="stylesheet">#}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
@@ -19,10 +20,11 @@
     <fieldset>
         <div class="form-card">
             <h2 class="fs-title">Event Information</h2>
+            <input type="hidden" name="id" id="id" value="" />
             <input type="text" name="name" id="name" placeholder="Name" />
             <input type="text" name="awarded_by" id="awarded_by" placeholder="Awarded By" />
         </div>
-        <input type="button" name="next" class="next action-button" value="Next Step" />
+        <input type="button" name="next" class="next action-button" value="Next Step" onclick="event_information_save()" />
     </fieldset>
     <fieldset>
         <div class="form-card">
