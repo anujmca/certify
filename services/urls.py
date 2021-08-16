@@ -18,5 +18,8 @@ urlpatterns = [
 
     path('templates/', views_restful.TemplateList.as_view()),
     path('templates/<int:pk>/', views_restful.TemplateDetail.as_view()),
+
+    path('datasheets/', views_restful.DataSheetList.as_view()),
+    path('datasheets/<int:pk>/', views_restful.DataSheetDetail.as_view()),
 ]
 
