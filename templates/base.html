@@ -8,6 +8,7 @@
     <title>Certify</title>
 
     <script src="{% static 'js/lib/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
 
 
     <!-- Bootstrap CSS -->
@@ -74,7 +75,7 @@
                   <li class="nav-item">
                     <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATE_SETUP %}active{% endif %}" aria-current="page" href="/certificates/setup">
                       <span data-feather="file-plus"></span>
-                      Setup a new Event
+                      Setup a new Certificate
                     </a>
                   </li>
                   <li class="nav-item">

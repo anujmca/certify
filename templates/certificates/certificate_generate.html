@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% block content %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Event</th>
+      <th scope="col">Template</th>
+      <th scope="col">Data Sheet</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+    <tr>
+        <th scope="row">{{ event.id }}</th>
+        <td>{{ event.name }}</td>
+        <td>
+            <span data-toggle="tooltip" title="{{ event.template.description}}">
+                {{ event.template.name }}
+            </span>
+            {% if event.template.tokens %}
+            <div>
+                <small class="text-muted">
+                (tokens: {{ event.template.tokens|csv }})
+                </small>
+            </div>
+            {% endif %}
+        </td>
+        <td>
+            <span data-toggle="tooltip" title="{{ event.datasheet.description}}">
+            {{ event.datasheet.name }}
+            </span>
+            {% if event.datasheet.tokens %}
+            <div>
+                <small class="text-muted">
+                (tokens: {{ event.datasheet.tokens|csv }})
+                </small>
+            </div>
+            {% endif %}
+        </td>
+        <td>{{ event.status }}</td>
+        <td>
+            <div style="height: 40px;">
+            {% if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED %}
+            Download
+            {% elif event.status == settings.EVENT_STATUS.READY_TO_GENERATE %}
+            <a href="/certificates/setup/{{ event.id }}" class="btn btn-primary">Generate</a>
+            {% elif event.status == settings.EVENT_STATUS.INVALID_DATA_KEYS %}
+            <a href="/certificates/setup/{{ event.id }}" class="btn btn-danger">Correct</a>
+            {% elif event.status == settings.EVENT_STATUS.PENDING_PAYMENT %}
+            Payment Pending
+            {% elif event.status == settings.EVENT_STATUS.PENDING_DATASHEET %}
+            <a href="/certificates/setup/{{ event.id }}#datasheet" class="btn btn-warning">Complete Setup</a>
+            {% elif event.status == settings.EVENT_STATUS.PENDING_TEMPLATE %}
+            <a href="/certificates/setup/{{ event.id }}#template" class="btn btn-warning">Complete Setup</a>
+            {% endif %}
+            </div>
+        </td>
+
+{#      <td>#}
+{#          {% for data_key in certificate.data_keys.all %}#}
+{#              {{ data_key.name }}: {{ data_key.value }}{% if not forloop.last %},{% endif %}#}
+{#          {% endfor %}#}
+{#      </td>#}
+{#      <td>#}
+{#          <a href="/services/certificates/download/{{ certificate.file }}">#}
+{#              {{ certificate.file }}</a>#}
+{#          <a href="{{ MEDIA_URL }}{{ certificate.file }}" download>{{ certificate.file }}</a>#}
+{#      </td>#}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

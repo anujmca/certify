@@ -145,7 +145,6 @@ class TemplateDetail(APIView):
 # endregion
 
 
-
 # region DataSheet Views
 class DataSheetList(APIView):
     """

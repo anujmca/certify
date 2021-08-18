@@ -2,6 +2,31 @@ let url_events = '/services/events/',
     url_templates = '/services/templates/',
     url_datasheets = '/services/datasheets/';;
 
+function goto_step(step_index){
+    for(let index=0; index<step_index; index++){
+        $($("#progressbar li")[index]).addClass("active");
+        $($('fieldset')[index]).css('display', 'None');
+        $($('fieldset')[index]).css('opacity', 0);
+    }
+
+    $($("#progressbar li")[step_index]).addClass("active");
+    $($('fieldset')[step_index]).css('display', 'block');
+    $($('fieldset')[step_index]).css('opacity', 1);
+}
+
+$( document ).ready(function() {
+    let step_info = 0, step_template=1, step_datasheet=2, step_finish=3;
+
+    switch (window.location.hash) {
+      case '#template':
+        goto_step(step_template);
+        break;
+      case '#datasheet':
+        goto_step(step_datasheet);
+        break;
+    }
+});
+
 function event_information_save()
 {
     let id = $('#id').val(),
@@ -31,12 +56,28 @@ function event_information_save()
     });
 }
 
-function template_save(){
+function set_template_id(template_id) {
+    $('#selected_template span').text(template_id);
+    $('#selected_template').removeAttr('hidden');
+
+    $('#template_id').val(template_id);
+}
+
+function is_uploading_new_template() {
+    let name = $('#template_name').val(),
+        description = $('#template_description').val(),
+        files = $('#event_template_file')[0].files;
+
+    // Check file selected or not
+    return (files.length > 0 && name != '' && description != '');
+}
+
+function template_save(is_new_template){
     let id = ($('#template_id').length ? $('#template_id').val() : ''),
         name = $('#template_name').val(),
         description = $('#template_description').val();
 
-    let isNew = (!id || id == '' || id == undefined);
+    let isNew = is_new_template || (!id || id == '' || id == undefined);
 
     let payload = new FormData();
     let files = $('#event_template_file')[0].files;
@@ -63,9 +104,7 @@ function template_save(){
             id = data.id;
             let template_id = ($('#template_id').length ? $('#template_id').val() : '');
             let wasNew = (!template_id || template_id == '' || template_id == undefined);
-            if(wasNew && $('#template_id').length) {
-                $('#template_id').val(data.id);
-            }
+            set_template_id(template_id=data.id);
         }
     });
 
@@ -116,15 +155,19 @@ function datasheet_save(){
 function event_template_save()
 {
     let selected_existing_template_id = $('input[name=existing-template]:checked').val(),
-        event_id = $('#id').val();
+        event_id = $('#id').val(),
+        is_new_template = is_uploading_new_template();
 
     let template_id = -1;
-    if (selected_existing_template_id != '' && selected_existing_template_id != undefined) {
+
+    if (!is_new_template && (selected_existing_template_id != '' && selected_existing_template_id != undefined)) {
         template_id = selected_existing_template_id;
     }
     else{
-        template_id = template_save();
+        template_id = template_save(is_new_template);
     }
+
+    set_template_id(template_id=template_id);
 
     let payload={'template_id': template_id}
     let url = url_events + event_id + '/';

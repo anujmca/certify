@@ -1,5 +1,6 @@
-<div class="form-card">
+-<div class="form-card">
     <h2 class="fs-title">Template Selection</h2>
+    <span id="selected_template" class="title-hint" {% if not event.template %}hidden{% endif %}>Template: <span>{% if event.template %}{{ event.template.name }}{% endif %}</span></span>
     <div class="accordion" id="accordionExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
@@ -23,7 +24,7 @@
               <div class="carousel-caption d-none d-md-block">
                 <h5>{{ template.name }}</h5>
                 <p>{{ template.description }}</p>
-                <input type="radio" name="existing-template"  class="btn-check" id="existing-template-{{ template.id }}" autocomplete="off" value="{{ template.id }}">
+                <input type="radio" {% if event.template.id == template.id %}checked{% endif %} name="existing-template"  class="btn-check" id="existing-template-{{ template.id }}" autocomplete="off" value="{{ template.id }}">
                 <label class="btn btn-outline-primary" for="existing-template-{{ template.id }}">Select This</label><br>
               </div>
             </div>

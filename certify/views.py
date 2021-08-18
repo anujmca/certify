@@ -55,8 +55,9 @@ def certificates_setup(request, pk=None):
 @login_required
 def certificates_generate(request):
     context = {'content_title': settings.CONTENT_TITLE.CERTIFICATE_GENERATE,
-               'certificates': Certificate.objects.all()}
-    return render(request, 'certificates.html', context)
+               'events': Event.objects.all()}
+    return render(request, 'certificates\certificate_generate.html', context)
+
 
 # class CertificateTableView(tables.SingleTableView):
 #     table_class = CertificateTable

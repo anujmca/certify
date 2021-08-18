@@ -98,7 +98,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'tags': 'certify.tags',
-
+                'filters': 'certify.filters',
             }
         },
     },
@@ -188,11 +188,24 @@ CONTENT_TITLE = SimpleNamespace(**{
     'CERTIFICATES': 'Certificates',
     'CERTIFICATE_SETUP': 'Certificate Setup',
     'CERTIFICATE_GENERATE': 'Certificate Generate',
+    'EVENTS': 'Generate Certificates',
     'EMPLOYEES': 'Employees',
     'REPORTS': 'Reports',
 })
+
+EVENT_STATUS = SimpleNamespace(**{
+    'PENDING_TEMPLATE': 'Template Pending', # Just the name and descriptions are added
+    'PENDING_DATASHEET': 'Data Sheet Pending',
+    'PENDING_PAYMENT': 'Payment Pending',
+    'INVALID_DATA_KEYS': 'Invalid Datakeys',
+    'READY_TO_GENERATE': 'Ready To Generate',
+    'CERTIFICATE_GENERATED': 'Generated',
+})
 # endregion
 
+# region CONFIGURATIONS
+IS_HARDCODED_OTP = True
+# endregion
 
 REST_FRAMEWORK = {
 

@@ -3,6 +3,11 @@ from datetime import datetime
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
+
+
+from certify import settings
+from services import utilities
 
 
 class BaseModel(models.Model):
@@ -38,11 +43,16 @@ class Profile(BaseModel):
 class Template(BaseModel):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=400, null=True)
-    # data_sheet = models.FileField(upload_to='data_sheets/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/data_sheets/2015/01/30
     file = models.FileField(upload_to='templates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/templates/2015/01/30
+    tokens = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.tokens = utilities.get_ppt_tokens(self.file)
+        super(Template, self).save(*args, **kwargs)
+
 
 
 class DataSheet(BaseModel):
@@ -50,11 +60,18 @@ class DataSheet(BaseModel):
     description = models.CharField(max_length=400, null=True)
     data_sheet = models.FileField(
         upload_to='data_sheets/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/data_sheets/2015/01/30
-    template = models.ForeignKey(Template, related_name="data_sheet", null=True, on_delete=models.CASCADE)
+    # template = models.ForeignKey(Template, related_name="data_sheet", null=True, on_delete=models.CASCADE)
+    tokens = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        tokens = utilities.get_excel_headers(self.data_sheet)
+        self.tokens = list()
+        for token in tokens:
+            self.tokens.append(token)
+        super(DataSheet, self).save(*args, **kwargs)
 
 class DataKey(BaseModel):
     name = models.CharField(max_length=50, null=False, unique=False)
@@ -82,6 +99,21 @@ class Event(BaseModel):
     def __str__(self):
         return self.name
 
+    @property
+    def status(self):
+        status = None
+        if (self.name and self.awarded_by):
+            if self.template is None:
+                status = settings.EVENT_STATUS.PENDING_TEMPLATE
+            elif self.datasheet is None:
+                status = settings.EVENT_STATUS.PENDING_DATASHEET
+            # elif self.payment is None:
+            #     status = settings.EVENT_STATUS.PENDING_PAYMENT
+            elif not self.template.tokens.__eq__(self.datasheet.tokens):
+                status = settings.EVENT_STATUS.INVALID_DATA_KEYS
+            else:
+                status = settings.EVENT_STATUS.READY_TO_GENERATE
+        return status
 
 
 # import django_tables2 as tables

@@ -32,16 +32,18 @@ def login(request):
                 return redirect('/login')
 
         elif 'request-otp' in request.POST:
-            otp = randint(1000, 9999)
+            otp = 1234
+            if settings.IS_HARDCODED_OTP == False:
+                otp = randint(1000, 9999)
 
-            # account_sid = 'AC11de2df9f81f5b40d469bd0c8b5ccfd7'
-            # auth_token = '9d53e967ffb87caa796c733f90ecd1ab'
-            # client = TwilioClient(account_sid, auth_token)
-            # message = client.messages.create(
-            #     body=f'{otp} is your OTP for certify, valid for next 15 minutes',
-            #     from_='+12512418305',
-            #     to=email_or_phone
-            # )
+                account_sid = 'AC11de2df9f81f5b40d469bd0c8b5ccfd7'
+                auth_token = '5f9b586fc93ef34310ae7bef1c11e793'
+                client = TwilioClient(account_sid, auth_token)
+                message = client.messages.create(
+                    body=f'{otp} is your OTP for certify, valid for next 15 minutes',
+                    from_='+12512418305',
+                    to=email_or_phone
+                )
 
             dt = datetime.datetime.now(timezone.utc)
             utc_time = dt.replace(tzinfo=timezone.utc)
@@ -51,7 +53,9 @@ def login(request):
             user.profile.otp_valid_till = utc_time + datetime.timedelta(minutes=1)
             user.profile.save()
 
-            context = {'otp_sent': True}
+            context = {'otp_sent': True,
+                       'email_or_phone': email_or_phone}
+
             return redirect('/login', context)
         elif 'verify-otp' in request.POST:
             otp = request.POST['otp']
