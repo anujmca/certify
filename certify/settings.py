@@ -188,7 +188,7 @@ CONTENT_TITLE = SimpleNamespace(**{
     'CERTIFICATES': 'Certificates',
     'CERTIFICATE_SETUP': 'Certificate Setup',
     'CERTIFICATE_GENERATE': 'Certificate Generate',
-    'CERTIFICATE_GENERATED': 'Generated Certificate',
+    'CERTIFICATE_GENERATED': 'Past Certificates',
     'EVENTS': 'Generate Certificates',
     'EMPLOYEES': 'Employees',
     'REPORTS': 'Reports',
