@@ -5,7 +5,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 
-
 from certify import settings
 from services import utilities
 
@@ -33,6 +32,7 @@ class BaseModel(models.Model):
 class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     phone_number = models.CharField(max_length=100, null=False, unique=True)
+    client_user_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
     otp = models.CharField(max_length=10, null=True, blank=True, unique=False, )
     otp_valid_till = models.DateTimeField(null=True, blank=True, editable=True, help_text="UTC Time")
 
@@ -54,7 +54,6 @@ class Template(BaseModel):
         super(Template, self).save(*args, **kwargs)
 
 
-
 class DataSheet(BaseModel):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=400, null=True)
@@ -73,6 +72,7 @@ class DataSheet(BaseModel):
             self.tokens.append(token)
         super(DataSheet, self).save(*args, **kwargs)
 
+
 class DataKey(BaseModel):
     name = models.CharField(max_length=50, null=False, unique=False)
     value = models.CharField(max_length=200, null=False, unique=False)
@@ -81,20 +81,14 @@ class DataKey(BaseModel):
         return self.name
 
 
-class Certificate(BaseModel):
-    created_by = models.ForeignKey(User, related_name="certificate_created", null=True, on_delete=models.CASCADE)
-    template = models.ForeignKey(Template, related_name="certificates", null=True, on_delete=models.CASCADE)
-    batch_id = models.IntegerField()
-    data_keys = models.ManyToManyField(DataKey, related_name="certificates")
-    file = models.FileField(
-        upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
-
-
 class Event(BaseModel):
     name = models.CharField(max_length=100, null=False)
     awarded_by = models.CharField(max_length=100, null=False)
     template = models.ForeignKey(Template, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
     datasheet = models.ForeignKey(DataSheet, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
+
+    awardee_count = models.IntegerField(null=True, blank=True)
+    are_certificates_generated = models.BooleanField(null=True, blank=True, default=False)
 
     def __str__(self):
         return self.name
@@ -102,18 +96,56 @@ class Event(BaseModel):
     @property
     def status(self):
         status = None
-        if (self.name and self.awarded_by):
-            if self.template is None:
-                status = settings.EVENT_STATUS.PENDING_TEMPLATE
-            elif self.datasheet is None:
-                status = settings.EVENT_STATUS.PENDING_DATASHEET
-            # elif self.payment is None:
-            #     status = settings.EVENT_STATUS.PENDING_PAYMENT
-            elif not self.template.tokens.__eq__(self.datasheet.tokens):
-                status = settings.EVENT_STATUS.INVALID_DATA_KEYS
-            else:
-                status = settings.EVENT_STATUS.READY_TO_GENERATE
+        if not self.are_certificates_generated:
+            if (self.name and self.awarded_by):
+                if self.template is None:
+                    status = settings.EVENT_STATUS.PENDING_TEMPLATE
+                elif self.datasheet is None:
+                    status = settings.EVENT_STATUS.PENDING_DATASHEET
+                # elif self.payment is None:
+                #     status = settings.EVENT_STATUS.PENDING_PAYMENT
+                elif not set(utilities.DEFAULT_TOKENS).issubset(set(self.datasheet.tokens)):
+                    status = settings.EVENT_STATUS.INVALID_DATA_KEYS
+                elif not set(self.template.tokens).issubset(set(self.datasheet.tokens)):
+                    status = settings.EVENT_STATUS.MISMATCHING_KEYS
+                else:
+                    status = settings.EVENT_STATUS.READY_TO_GENERATE
+        else:
+            status = settings.EVENT_STATUS.CERTIFICATE_GENERATED
         return status
+
+    @property
+    def certificate_generated_count(self):
+        return len(self.certificates)
+
+    @property
+    def sms_available_count(self):
+        return len(self.certificates.filter(sms_available__exact=True))
+
+    @property
+    def email_available_count(self):
+        return len(self.certificates.filter(email_available__exact=True))
+
+    @property
+    def sms_sent_count(self):
+        return len(self.certificates.filter(sms_sent__exact=True))
+
+    @property
+    def email_sent_count(self):
+        return len(self.certificates.filter(email_sent__exact=True))
+
+
+class Certificate(BaseModel):
+    awardee = models.ForeignKey(User, related_name="certificates", null=True, blank=True, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name="certificates", null=False, blank=False, on_delete=models.CASCADE)
+    batch_id = models.IntegerField()
+    data_keys = models.ManyToManyField(DataKey, related_name="certificates")
+    sms_available = models.BooleanField(null=False, blank=False, default=False)
+    email_available = models.BooleanField(null=False, blank=False, default=False)
+    sms_sent =  models.BooleanField(null=False, blank=False, default=False)
+    email_sent = models.BooleanField(null=False, blank=False, default=False)
+    file = models.FileField(
+        upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
 
 
 # import django_tables2 as tables

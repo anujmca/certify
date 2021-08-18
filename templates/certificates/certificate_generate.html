@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load filters %}
 {% block content %}
+{% load static %}
+<script src="{% static 'js/certificate-generate.js' %}"></script>
+
+{% csrf_token %}
 <table class="table table-striped">
   <thead>
     <tr>
@@ -24,7 +28,7 @@
             {% if event.template.tokens %}
             <div>
                 <small class="text-muted">
-                (tokens: {{ event.template.tokens|csv }})
+                (keys: {{ event.template.tokens|csv }})
                 </small>
             </div>
             {% endif %}
@@ -36,7 +40,7 @@
             {% if event.datasheet.tokens %}
             <div>
                 <small class="text-muted">
-                (tokens: {{ event.datasheet.tokens|csv }})
+                (keys: {{ event.datasheet.tokens|csv }})
                 </small>
             </div>
             {% endif %}
@@ -47,9 +51,9 @@
             {% if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED %}
             Download
             {% elif event.status == settings.EVENT_STATUS.READY_TO_GENERATE %}
-            <a href="/certificates/setup/{{ event.id }}" class="btn btn-primary">Generate</a>
-            {% elif event.status == settings.EVENT_STATUS.INVALID_DATA_KEYS %}
-            <a href="/certificates/setup/{{ event.id }}" class="btn btn-danger">Correct</a>
+            <button onclick="generate_certificate({{ event.id }})" class="btn btn-primary">Generate</button>
+            {% elif event.status == settings.EVENT_STATUS.INVALID_DATA_KEYS or event.status == settings.EVENT_STATUS.MISMATCHING_KEYS %}
+            <a href="/certificates/setup/{{ event.id }}" class="btn btn-danger">Fix it</a>
             {% elif event.status == settings.EVENT_STATUS.PENDING_PAYMENT %}
             Payment Pending
             {% elif event.status == settings.EVENT_STATUS.PENDING_DATASHEET %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% block content %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Event</th>
+{#      <th scope="col">Template</th>#}
+      <th scope="col">Count</th>
+      <th scope="col">Generated</th>
+      <th scope="col">SMS Present</th>
+      <th scope="col">Email Present</th>
+      <th scope="col">SMS Sent</th>
+      <th scope="col">Email Sent</th>
+      <th scope="col">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+    <tr>
+        <th scope="row">{{ event.id }}</th>
+        <td>{{ event.name }}</td>
+{#        <td>#}
+{#            <span data-toggle="tooltip" title="{{ event.template.description}}">#}
+{#                {{ event.template.name }}#}
+{#            </span>#}
+{#            {% if event.template.tokens %}#}
+{#            <div>#}
+{#                <small class="text-muted">#}
+{#                (keys: {{ event.template.tokens|csv }})#}
+{#                </small>#}
+{#            </div>#}
+{#            {% endif %}#}
+{#        </td>#}
+        <td>count</td>
+        <td>generated</td>
+        <td>sms present</td>
+        <td>email present</td>
+        <td>sms sent</td>
+        <td>email sent</td>
+        <td>
+            <a href="/certificates/setup/{{ event.id }}" class="btn btn-primary">Details</a>
+        </td>
+
+{#      <td>#}
+{#          {% for data_key in certificate.data_keys.all %}#}
+{#              {{ data_key.name }}: {{ data_key.value }}{% if not forloop.last %},{% endif %}#}
+{#          {% endfor %}#}
+{#      </td>#}
+{#      <td>#}
+{#          <a href="/services/certificates/download/{{ certificate.file }}">#}
+{#              {{ certificate.file }}</a>#}
+{#          <a href="{{ MEDIA_URL }}{{ certificate.file }}" download>{{ certificate.file }}</a>#}
+{#      </td>#}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

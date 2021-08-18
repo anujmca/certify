@@ -188,6 +188,7 @@ CONTENT_TITLE = SimpleNamespace(**{
     'CERTIFICATES': 'Certificates',
     'CERTIFICATE_SETUP': 'Certificate Setup',
     'CERTIFICATE_GENERATE': 'Certificate Generate',
+    'CERTIFICATE_GENERATED': 'Generated Certificate',
     'EVENTS': 'Generate Certificates',
     'EMPLOYEES': 'Employees',
     'REPORTS': 'Reports',
@@ -197,7 +198,8 @@ EVENT_STATUS = SimpleNamespace(**{
     'PENDING_TEMPLATE': 'Template Pending', # Just the name and descriptions are added
     'PENDING_DATASHEET': 'Data Sheet Pending',
     'PENDING_PAYMENT': 'Payment Pending',
-    'INVALID_DATA_KEYS': 'Invalid Datakeys',
+    'MISMATCHING_KEYS': 'Mismatching Keys',
+    'INVALID_DATA_KEYS': 'Mandatory Keys Missing',
     'READY_TO_GENERATE': 'Ready To Generate',
     'CERTIFICATE_GENERATED': 'Generated',
 })
@@ -205,6 +207,7 @@ EVENT_STATUS = SimpleNamespace(**{
 
 # region CONFIGURATIONS
 IS_HARDCODED_OTP = True
+IS_HARDCODED_PASSWORD_GENERATED = True
 # endregion
 
 REST_FRAMEWORK = {

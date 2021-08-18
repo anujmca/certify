@@ -29,6 +29,7 @@ urlpatterns = [
     path('certificates/setup', views.certificates_setup, name='certificates_setup'),
     path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
     path('certificates/generate', views.certificates_generate, name='certificates_generate'),
+    path('certificates/generated', views.certificates_generated, name='certificates_generated'),
     # path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
 
     path('employees', views.employees, name='employees'),

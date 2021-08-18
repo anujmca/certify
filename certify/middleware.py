@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 class CustomAuthenticationBackend(MiddlewareMixin):
     def authenticate(self, request, email_or_phone=None, password=None, otp=None):
         try:
-            user = User.objects.get(Q(email=email_or_phone) | Q(profile__phone_number=email_or_phone))
+            user = utilities.get_user_by_email_or_phone(email=email_or_phone, phone=email_or_phone)
             if password:
                 pwd_valid = user.check_password(password)
                 if pwd_valid:

@@ -59,6 +59,13 @@ def certificates_generate(request):
     return render(request, 'certificates\certificate_generate.html', context)
 
 
+@login_required
+def certificates_generated(request):
+    context = {'content_title': settings.CONTENT_TITLE.CERTIFICATE_GENERATED,
+               'events': Event.objects.all()}
+    return render(request, 'certificates\past_certificates.html', context)
+
+
 # class CertificateTableView(tables.SingleTableView):
 #     table_class = CertificateTable
 #     queryset = Certificate.objects.all()
