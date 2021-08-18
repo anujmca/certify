@@ -62,7 +62,7 @@ def certificates_generate(request):
 @login_required
 def certificates_generated(request):
     context = {'content_title': settings.CONTENT_TITLE.CERTIFICATE_GENERATED,
-               'events': Event.objects.all()}
+               'events': Event.objects.filter(are_certificates_generated=True).all()}
     return render(request, 'certificates\past_certificates.html', context)
 
 

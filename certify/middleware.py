@@ -12,11 +12,13 @@ from services.models import *
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 
+from services.views_restful import get_user_by_email_or_phone
+
 
 class CustomAuthenticationBackend(MiddlewareMixin):
     def authenticate(self, request, email_or_phone=None, password=None, otp=None):
         try:
-            user = utilities.get_user_by_email_or_phone(email=email_or_phone, phone=email_or_phone)
+            user = get_user_by_email_or_phone(email=email_or_phone, phone=email_or_phone)
             if password:
                 pwd_valid = user.check_password(password)
                 if pwd_valid:

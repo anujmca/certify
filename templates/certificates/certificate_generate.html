@@ -17,6 +17,7 @@
     </tr>
   </thead>
   <tbody>
+    {% if events %}
     {% for event in events %}
     <tr>
         <th scope="row">{{ event.id }}</th>
@@ -45,15 +46,18 @@
             </div>
             {% endif %}
         </td>
-        <td>{{ event.status }}</td>
+        <td id="status_{{ event.id }}">{{ event.status }}</td>
         <td>
-            <div style="height: 40px;">
+            <div id="action_{{ event.id }}" style="height: 40px;">
             {% if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED %}
-            Download
+            <a href="/certificates/generated" class="btn btn-primary">Details</a>
+            <a href="javascript:generate_certificate({{ event.id }})">Regenerate</a>
             {% elif event.status == settings.EVENT_STATUS.READY_TO_GENERATE %}
             <button onclick="generate_certificate({{ event.id }})" class="btn btn-primary">Generate</button>
-            {% elif event.status == settings.EVENT_STATUS.INVALID_DATA_KEYS or event.status == settings.EVENT_STATUS.MISMATCHING_KEYS %}
-            <a href="/certificates/setup/{{ event.id }}" class="btn btn-danger">Fix it</a>
+            {% elif event.status == settings.EVENT_STATUS.INVALID_DATA_KEYS %}
+            <a href="/certificates/setup/{{ event.id }}#datasheet" class="btn btn-danger">Fix it</a>
+            {% elif event.status == settings.EVENT_STATUS.MISMATCHING_KEYS %}
+            <a href="/certificates/setup/{{ event.id }}#template" class="btn btn-danger">Fix it</a>
             {% elif event.status == settings.EVENT_STATUS.PENDING_PAYMENT %}
             Payment Pending
             {% elif event.status == settings.EVENT_STATUS.PENDING_DATASHEET %}
@@ -76,6 +80,38 @@
 {#      </td>#}
     </tr>
     {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="6">
+            No records found
+        </td>
+    </tr>
+    {% endif %}
   </tbody>
 </table>
+
+
+
+<!-- Button trigger modal -->
+<button id="myInput" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+ <div class="modal fade" id="exampleModalCenter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       </div>
+       <div class="modal-body">
+         Certificates generated successfully
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
 {% endblock %}

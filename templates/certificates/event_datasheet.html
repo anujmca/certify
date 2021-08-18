@@ -29,7 +29,7 @@
                     <a href="{{ MEDIA_URL }}{{ datasheet.data_sheet }}" download class="cursor-hand">{{ datasheet.data_sheet }}</a>
                   </td>
                   <td>
-                    <input type="radio" name="existing-datasheet" class="btn-check" id="existing-datasheet-{{ datasheet.id }}" autocomplete="off" value="{{ datasheet.id }}">
+                    <input type="radio" {% if event.datasheet.id == datasheet.id %}checked{% endif %}   name="existing-datasheet" class="btn-check" id="existing-datasheet-{{ datasheet.id }}" autocomplete="off" value="{{ datasheet.id }}">
                     <label class="btn btn-outline-primary cursor-hand" for="existing-datasheet-{{ datasheet.id }}">Select This</label><br>
                   </td>
                 </tr>

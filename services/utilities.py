@@ -1,10 +1,14 @@
 from pandas import *
 from pptx import Presentation
+import re
+
 from enum import Enum
 
-from django.db.models import Q
-# from pandas import *
-from services.models import *
+
+# from django.db.models import Q
+# # from pandas import *
+# from services.models import *
+# from services.models import Profile
 
 
 class BaseToken():
@@ -36,32 +40,12 @@ def get_ppt_tokens(template_file):
     return tokens.sort()
 
 
-def get_user_by_awardee(df_awardee):
-    phone = df_awardee[BaseToken.phone_number]
-    email = df_awardee[BaseToken.email_id]
-
-    user = get_user_by_email_or_phone(email, phone)
-    password = None
-
-    if user is None:
-        user_name = email if email else phone if phone else None
-        if user_name:
-            password = User.objects.make_random_password() if settings.IS_HARDCODED_PASSWORD_GENERATED == False else 'Gurgaon1'
-            user = User.objects.create_user(username=user_name, email=email, password=password)
-            user.first_name = df_awardee[BaseToken.first_name]
-            user.last_name = df_awardee[BaseToken.last_name]
-            user.save()
-            profile = Profile.objects.create(user=user)
-            profile.phone_number = phone
-            profile.client_user_id = df_awardee[BaseToken.id]
-            profile.save()
-            user.save()
-
-    return user, password
-
-
-def get_user_by_email_or_phone(email, phone):
+def is_valid_email(email):
+    regex_email = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     try:
-        return User.objects.get(Q(email=email) | Q(profile__phone_number=phone))
-    except User.DoesNotExist:
-        return None
+        if re.search(regex_email, email):
+            return True
+        else:
+            return False
+    except:
+        return False

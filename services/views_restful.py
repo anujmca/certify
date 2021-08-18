@@ -14,16 +14,49 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 
 
 from io import StringIO, BytesIO
-from pandas import *
 from generators import pptxGenerator as generator
+from .utilities import *
+from django.db.models import Q
 from services.models import *
-from .utilities import get_user_by_awardee
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
 
+# region Utilities
+def get_user_by_awardee(df_awardee):
+    phone = df_awardee[BaseToken.phone_number]
+    email = df_awardee[BaseToken.email_id]
+    email = email if is_valid_email(email) else None
+
+    user = get_user_by_email_or_phone(email, phone)
+    password = None
+
+    if user is None:
+        user_name = email if email else phone if phone else None
+        if user_name and user_name is str:
+            password = User.objects.make_random_password() if settings.IS_HARDCODED_PASSWORD_GENERATED == False else 'Gurgaon1'
+            user = User.objects.create_user(username=user_name, password=password)
+            if email is not None:
+                user.email = email
+            user.first_name = df_awardee[BaseToken.first_name]
+            user.last_name = df_awardee[BaseToken.last_name]
+            user.save()
+            profile = Profile.objects.create(user=user)
+            profile.phone_number = phone
+            profile.client_user_id = df_awardee[BaseToken.id]
+            profile.save()
+            user.save()
+
+    return user, password
+
+def get_user_by_email_or_phone(email, phone):
+    try:
+        return User.objects.get(Q(email=email) | Q(profile__phone_number=phone))
+    except User.DoesNotExist:
+        return None
+# endregion
 
 # region Event Views
 class EventList(APIView):
@@ -255,8 +288,11 @@ def generate_certificate(request):
             user, password = get_user_by_awardee(row)
 
             certificate = None
-            if password is None: # existing user
-                certificate = Certificate.objects.get(awardee=user, event=event)
+            if user is not None and password is None: # existing user
+                try:
+                    certificate = Certificate.objects.get(awardee=user, event=event)
+                except:
+                    certificate = None
 
             if certificate is None:
                 certificate = Certificate(batch_id=batch_id, event=event)
@@ -278,9 +314,11 @@ def generate_certificate(request):
         event.awardee_count = awardee_count
         event.are_certificates_generated = True
         event.save()
-        return Response(status=status.HTTP_200_OK)
+        data = {'id': event.id, 'result': 'success'}
+        return Response(data=data, status=status.HTTP_200_OK)
     else:
-        return Response(status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+        data = {'id': event.id, 'result': 'failure'}
+        return Response(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # endregion

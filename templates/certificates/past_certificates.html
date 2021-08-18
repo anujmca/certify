@@ -17,6 +17,7 @@
     </tr>
   </thead>
   <tbody>
+    {% if events %}
     {% for event in events %}
     <tr>
         <th scope="row">{{ event.id }}</th>
@@ -33,12 +34,12 @@
 {#            </div>#}
 {#            {% endif %}#}
 {#        </td>#}
-        <td>count</td>
-        <td>generated</td>
-        <td>sms present</td>
-        <td>email present</td>
-        <td>sms sent</td>
-        <td>email sent</td>
+        <td>{{ event.awardee_count }}</td>
+        <td>{{ event.certificate_generated_count }}</td>
+        <td>{{ event.sms_available_count }}</td>
+        <td>{{ event.email_available_count }}</td>
+        <td>{{ event.sms_sent_count }}</td>
+        <td>{{ event.email_sent_count }}</td>
         <td>
             <a href="/certificates/setup/{{ event.id }}" class="btn btn-primary">Details</a>
         </td>
@@ -55,6 +56,13 @@
 {#      </td>#}
     </tr>
     {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="9">
+            No records found
+        </td>
+    </tr>
+    {% endif %}
   </tbody>
 </table>
 {% endblock %}

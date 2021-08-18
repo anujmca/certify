@@ -7,15 +7,18 @@ function generate_certificate(event_id)
     payload={'event_id': event_id}
 
     $.ajax({
-        async: true,
+        async: false,
         url: url_generate,
         headers:{"X-CSRFToken": csrf_token},
         dataType: 'JSON',
         type: 'POST',
         data: payload,
         success:function(data){
-            console.log(data);
-            alert(data);
+            if(data.result == 'success'){
+                $('#exampleModalCenter').modal("show");
+                $('#status_' + data.id).text("Generated");
+                $('#action_' + data.id).html('<a href="/certificates/generated" class="btn btn-primary">Details</a><a href="javascript:generate_certificate(' + data.id + ')">Regenerate</a>');
+            }
         }
     });
 }

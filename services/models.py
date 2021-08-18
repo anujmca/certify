@@ -87,7 +87,7 @@ class Event(BaseModel):
     template = models.ForeignKey(Template, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
     datasheet = models.ForeignKey(DataSheet, related_name="events", null=True, blank=True, on_delete=models.CASCADE)
 
-    awardee_count = models.IntegerField(null=True, blank=True)
+    awardee_count = models.IntegerField(null=True, blank=True, default=0)
     are_certificates_generated = models.BooleanField(null=True, blank=True, default=False)
 
     def __str__(self):
@@ -116,7 +116,7 @@ class Event(BaseModel):
 
     @property
     def certificate_generated_count(self):
-        return len(self.certificates)
+        return 0 if self.certificates is None else self.certificates.count()
 
     @property
     def sms_available_count(self):
