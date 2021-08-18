@@ -10,6 +10,14 @@ from django.conf import settings
 def login(request):
     next_url = request.GET.get('next')
     context = None if next_url is None else {'next': next_url}
+    if 'redirect-context' in request.session:
+        if context is not None:
+            context.update(request.session['redirect-context'])
+        else:
+            context = request.session['redirect-context']
+
+        del request.session['redirect-context']
+
     return render(request, 'login.html', context)
 
 

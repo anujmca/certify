@@ -95,7 +95,8 @@
         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
         <div class="form-floating">
-          <input class="form-control" name="email_or_phone" id="inputEmail" placeholder="name@example.com or +919313499294">
+          <input class="form-control" name="email_or_phone" id="inputEmail" placeholder="name@example.com or +919313499294"
+          {% if otp_sent %}value="{{ email_or_phone }}"{% endif %}>
           <label for="inputEmail">Email or Phone</label>
         </div>
         <div class="form-floating">
@@ -109,29 +110,34 @@
           </label>
         </div>
         <button class="w-100 btn btn-lg btn-dark" name="sign-in" type="submit">Sign in</button>
+        {% if not otp_sent %}
         <br><br>
         or
         <br>
         <br>
         <button class="w-100 btn btn-lg btn-dark" name="request-otp" type="submit">Request OTP</button>
+        {% else %}
         <br><br>
-        <div class="form-floating">
-            <div id="divOuter" style="margin:auto">
-                <div id="divInner">
-                    <input class="partitioned no-focus" name="otp" id="inputOtp" minlength="4" maxlength="4" autocomplete="off"
-                        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  onKeyPress="if(this.value.length==4) return false;"
-                    >
+        <div>
+            <div class="form-floating">
+                <div id="divOuter" style="margin:auto">
+                    <div id="divInner">
+                        <input class="partitioned no-focus" name="otp" id="inputOtp" minlength="4" maxlength="4" autocomplete="off"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  onKeyPress="if(this.value.length==4) return false;"
+                        >
+                    </div>
                 </div>
             </div>
+    {#          <div class="form-floating">#}
+    {#            <input id="codeBox1" type="number" maxlength="1" onkeyup="onKeyUpEvent(1, event)" onfocus="onFocusEvent(1)"/>#}
+    {#            <input id="codeBox2" type="number" maxlength="1" onkeyup="onKeyUpEvent(2, event)" onfocus="onFocusEvent(2)"/>#}
+    {#            <input id="codeBox3" type="number" maxlength="1" onkeyup="onKeyUpEvent(3, event)" onfocus="onFocusEvent(3)"/>#}
+    {#            <input id="codeBox4" type="number" maxlength="1" onkeyup="onKeyUpEvent(4, event)" onfocus="onFocusEvent(4)"/>#}
+    {#          </div>#}
+            <br>
+            <button class="w-100 btn btn-lg btn-dark" name="verify-otp" type="submit">Verify</button>
         </div>
-{#          <div class="form-floating">#}
-{#            <input id="codeBox1" type="number" maxlength="1" onkeyup="onKeyUpEvent(1, event)" onfocus="onFocusEvent(1)"/>#}
-{#            <input id="codeBox2" type="number" maxlength="1" onkeyup="onKeyUpEvent(2, event)" onfocus="onFocusEvent(2)"/>#}
-{#            <input id="codeBox3" type="number" maxlength="1" onkeyup="onKeyUpEvent(3, event)" onfocus="onFocusEvent(3)"/>#}
-{#            <input id="codeBox4" type="number" maxlength="1" onkeyup="onKeyUpEvent(4, event)" onfocus="onFocusEvent(4)"/>#}
-{#          </div>#}
-        <br>
-        <button class="w-100 btn btn-lg btn-dark" name="verify-otp" type="submit">Verify</button>
+        {% endif %}
       </form>
         <p class="mt-5 mb-3 text-muted">&copy; 2021–2022</p>
     </main>

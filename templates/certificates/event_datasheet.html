@@ -1,5 +1,6 @@
 <div class="form-card">
     <h2 class="fs-title">Datasheet Selection</h2>
+    <div id="selected_datasheet" class="title-hint" {% if not event.datasheet %}hidden{% endif %}>Datasheet: <span>{% if event.datasheet %}{{ event.datasheet.name }}{% endif %}</span></div>
     <div class="accordion" id="accordionExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
@@ -36,8 +37,6 @@
                 {% endfor %}
               </tbody>
             </table>
-
-
           </div>
         </div>
       </div>

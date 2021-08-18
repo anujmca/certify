@@ -1,6 +1,6 @@
 -<div class="form-card">
     <h2 class="fs-title">Template Selection</h2>
-    <span id="selected_template" class="title-hint" {% if not event.template %}hidden{% endif %}>Template: <span>{% if event.template %}{{ event.template.name }}{% endif %}</span></span>
+    <div id="selected_template" class="title-hint" {% if not event.template %}hidden{% endif %}>Template: <span>{% if event.template %}{{ event.template.name }}{% endif %}</span></div>
     <div class="accordion" id="accordionExample">
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">

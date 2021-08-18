@@ -11,7 +11,6 @@ admin.autodiscover()
 urlpatterns = [
     path('login', views.login, name='login'),
     path('logout', views.logout, name='logout'),
-    # path('certificates/generate2', views.generate_certificate, name='generate_certificate2'),
     path('certificates/generate', views_restful.generate_certificate, name='generate_certificate'),
 
     path('events/', views_restful.EventList.as_view()),
