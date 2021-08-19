@@ -142,7 +142,7 @@ class Certificate(BaseModel):
     data_keys = models.ManyToManyField(DataKey, related_name="certificates")
     sms_available = models.BooleanField(null=False, blank=False, default=False)
     email_available = models.BooleanField(null=False, blank=False, default=False)
-    sms_sent =  models.BooleanField(null=False, blank=False, default=False)
+    sms_sent = models.BooleanField(null=False, blank=False, default=False)
     email_sent = models.BooleanField(null=False, blank=False, default=False)
     file = models.FileField(
         upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30

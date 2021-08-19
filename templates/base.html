@@ -1,5 +1,6 @@
 {% load static %}
 {% load tags %}
+{% load filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,6 +61,7 @@
                   Dashboard
                 </a>
               </li>
+            {% if request.user|has_group:'issuer' %}
               <li class="nav-item border-top">
                 <a class="nav-link {% if content_title == settings.CONTENT_TITLE.TEMPLATES %}active{% endif %}" href="/templates">
                   <span data-feather="file"></span>
@@ -68,7 +70,7 @@
               </li>
               <li class="nav-item border-top">
                 <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATES %}active{% endif %}" href="/certificates">
-                  <span data-feather="layers"></span>
+                  <span data-feather="tool"></span>
                   Certificates
                 </a>
                 <ul class="nav-item flex-column">
@@ -93,9 +95,9 @@
                 </ul>
               </li>
               <li class="nav-item border-top">
-                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.EMPLOYEES %}active{% endif %}"  href="/employees">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.AWARDEES %}active{% endif %}"  href="/awardees">
                   <span data-feather="users"></span>
-                  Employees
+                  Awardees
                 </a>
               </li>
               <li class="nav-item border-top">
@@ -104,7 +106,15 @@
                   Reports
                 </a>
               </li>
-
+                {% endif %}
+                {% if request.user|has_group:'awardee' %}
+                   <li class="nav-item">
+                    <a class="nav-link {% if content_title == settings.CONTENT_TITLE.MY_CERTIFICATES %}active{% endif %}" aria-current="page" href="/mycertificates">
+                      <span data-feather="layers"></span>
+                      My Certificates
+                    </a>
+                  </li>
+                {% endif %}
             </ul>
           </div>
         </nav>

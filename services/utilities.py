@@ -11,7 +11,7 @@ from enum import Enum
 # from services.models import Profile
 
 
-class BaseToken():
+class BaseToken:
     id = 'id'
     first_name = 'first_name'
     last_name = 'last_name'
@@ -20,6 +20,15 @@ class BaseToken():
 
 
 DEFAULT_TOKENS = [BaseToken.id, BaseToken.first_name, BaseToken.last_name, BaseToken.phone_number, BaseToken.email_id]
+
+
+class Groups:
+    issuer = 'issuer'
+    awardee = 'awardee'
+
+
+def get_user_group_names(user):
+    return [group.name for group in user.groups.all()] if user is not None and user.groups is not None else []
 
 
 def get_excel_headers(data_sheet):

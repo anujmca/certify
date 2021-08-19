@@ -186,11 +186,12 @@ CONTENT_TITLE = SimpleNamespace(**{
     'DASHBOARD': 'Dashboard',
     'TEMPLATES': 'Templates',
     'CERTIFICATES': 'Certificates',
+    'MY_CERTIFICATES': 'Certificates Awarded To Me',
     'CERTIFICATE_SETUP': 'Certificate Setup',
     'CERTIFICATE_GENERATE': 'Certificate Generate',
     'CERTIFICATE_GENERATED': 'Past Certificates',
     'EVENTS': 'Generate Certificates',
-    'EMPLOYEES': 'Employees',
+    'AWARDEES': 'Awardees',
     'REPORTS': 'Reports',
 })
 
@@ -208,6 +209,7 @@ EVENT_STATUS = SimpleNamespace(**{
 # region CONFIGURATIONS
 IS_HARDCODED_OTP = True
 IS_HARDCODED_PASSWORD_GENERATED = True
+DATE_FORMAT = 'M d, Y'
 # endregion
 
 REST_FRAMEWORK = {

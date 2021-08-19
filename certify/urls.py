@@ -25,6 +25,7 @@ urlpatterns = [
 
     path('templates', views.templates, name='templates'),
     path('certificates', views.certificates, name='certificates'),
+    path('mycertificates', views.my_certificates, name='mycertificates'),
     # path('certificates', views.CertificateTableView, name='certificates'),
     path('certificates/setup', views.certificates_setup, name='certificates_setup'),
     path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
@@ -32,7 +33,7 @@ urlpatterns = [
     path('certificates/generated', views.certificates_generated, name='certificates_generated'),
     # path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
 
-    path('employees', views.employees, name='employees'),
+    path('awardees', views.awardees, name='awardees'),
 ]
 
 from django.conf.urls.static import static

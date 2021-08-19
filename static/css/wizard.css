@@ -73,13 +73,13 @@ html {
     box-shadow: none !important;
     border: none;
     font-weight: bold;
-    border-bottom: 2px solid skyblue;
+    border-bottom: 2px solid #0d6efd;
     outline-width: 0
 }
 
 #msform .action-button {
     width: 100px;
-    background: skyblue;
+    background: #0d6efd;
     font-weight: bold;
     color: white;
     border: 0 none;
@@ -91,7 +91,7 @@ html {
 
 #msform .action-button:hover,
 #msform .action-button:focus {
-    box-shadow: 0 0 0 2px white, 0 0 0 3px skyblue
+    box-shadow: 0 0 0 2px white, 0 0 0 3px #0d6efd
 }
 
 #msform .action-button-previous {
@@ -120,7 +120,7 @@ select.list-dt {
 }
 
 select.list-dt:focus {
-    border-bottom: 2px solid skyblue
+    border-bottom: 2px solid #0d6efd
 }
 
 .card {
@@ -183,7 +183,7 @@ select.list-dt:focus {
 
 #progressbar li.active:before,
 #progressbar li.active:after {
-    background: skyblue
+    background: #0d6efd
 }
 
 .radio-group {

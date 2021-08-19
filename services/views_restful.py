@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-
+from django.contrib.auth.models import Group
 
 
 from io import StringIO, BytesIO
@@ -18,14 +18,16 @@ from generators import pptxGenerator as generator
 from .utilities import *
 from django.db.models import Q
 from services.models import *
-
+from django.contrib.auth.decorators import login_required
+from .decorators import unauthenticated_user, allowed_users
+import services.utilities as utl
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return  # To not perform the csrf check previously happening
 
 # region Utilities
-def get_user_by_awardee(df_awardee):
+def get_user_by_awardee(request, df_awardee):
     phone = df_awardee[BaseToken.phone_number]
     email = df_awardee[BaseToken.email_id]
     email = email if is_valid_email(email) else None
@@ -35,15 +37,23 @@ def get_user_by_awardee(df_awardee):
 
     if user is None:
         user_name = email if email else phone if phone else None
-        if user_name and user_name is str:
+        if user_name and isinstance(user_name, str):
             password = User.objects.make_random_password() if settings.IS_HARDCODED_PASSWORD_GENERATED == False else 'Gurgaon1'
             user = User.objects.create_user(username=user_name, password=password)
             if email is not None:
                 user.email = email
             user.first_name = df_awardee[BaseToken.first_name]
             user.last_name = df_awardee[BaseToken.last_name]
+
+            # user.groups = [Group.objects.get(name=utl.Groups.awardee)]
+            awardee_group = Group.objects.get(name=utl.Groups.awardee)
+            if user.groups:
+                user.groups.add(awardee_group)
+            else:
+                user.groups = [awardee_group]
             user.save()
             profile = Profile.objects.create(user=user)
+            Profile.created_by = request.user
             profile.phone_number = phone
             profile.client_user_id = df_awardee[BaseToken.id]
             profile.save()
@@ -136,11 +146,15 @@ class TemplateList(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, format=None):
         templates = Template.objects.all()
         serializer = TemplateSerializer(templates, many=True)
         return Response(serializer.data)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def post(self, request, format=None):
         serializer = TemplateSerializer(data=request.data)
         if serializer.is_valid():
@@ -162,11 +176,15 @@ class TemplateDetail(APIView):
         except Template.DoesNotExist:
             raise Http404
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, pk, format=None):
         template = self.get_object(pk)
         serializer = TemplateSerializer(template)
         return Response(serializer.data)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def put(self, request, pk, format=None):
         template = self.get_object(pk)
         serializer = TemplateSerializer(template, data=request.data)
@@ -175,6 +193,8 @@ class TemplateDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def patch(self, request, pk, format=None):
         template = self.get_object(pk)
         serializer = TemplateSerializer(template, data=request.data, partial=True)
@@ -183,6 +203,8 @@ class TemplateDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def delete(self, request, pk, format=None):
         template = self.get_object(pk)
         template.delete()
@@ -198,11 +220,15 @@ class DataSheetList(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, format=None):
         datasheets = DataSheet.objects.all()
         serializer = DataSheetSerializer(datasheets, many=True)
         return Response(serializer.data)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def post(self, request, format=None):
         serializer = DataSheetSerializer(data=request.data)
         if serializer.is_valid():
@@ -224,11 +250,15 @@ class DataSheetDetail(APIView):
         except DataSheet.DoesNotExist:
             raise Http404
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         serializer = DataSheetSerializer(datasheet)
         return Response(serializer.data)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def put(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         serializer = DataSheetSerializer(datasheet, data=request.data)
@@ -237,6 +267,8 @@ class DataSheetDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def patch(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         serializer = DataSheetSerializer(datasheet, data=request.data, partial=True)
@@ -245,6 +277,8 @@ class DataSheetDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @login_required
+    @allowed_users(allowed_roles=[utl.Groups.issuer])
     def delete(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         datasheet.delete()
@@ -253,6 +287,8 @@ class DataSheetDetail(APIView):
 
 
 # region Function Based API
+@login_required
+@allowed_users(allowed_roles=[utl.Groups.issuer])
 @api_view(['POST'])
 @csrf_exempt
 def generate_certificate(request):
@@ -285,7 +321,7 @@ def generate_certificate(request):
             target_stream = BytesIO()
             certificate_file.save(target_stream)
 
-            user, password = get_user_by_awardee(row)
+            user, password = get_user_by_awardee(request, row)
 
             certificate = None
             if user is not None and password is None: # existing user
@@ -304,7 +340,12 @@ def generate_certificate(request):
             certificate.sms_available = False if user is None or user.profile.phone_number is None else True
             certificate.email_available = False if user is None or user.email is None else True
             certificate.data_keys.set(data_keys)
-            certificate.file.save(data_sheet_dictionary['employee_name'] + '_' + str(batch_id) + '.pptx', target_stream)
+            certificate_file_name = f'{data_sheet_dictionary[BaseToken.first_name]}' \
+                                    f'_{data_sheet_dictionary[BaseToken.last_name]}' \
+                                    f'_{event.id}_{batch_id}.pptx'
+
+            # certificate.file.save(data_sheet_dictionary['employee_name'] + '_' + str(batch_id) + '.pptx', target_stream)
+            certificate.file.save(certificate_file_name, target_stream)
             certificate.save()
 
             # send email here

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<script src="{% static 'js/my-certificates.js' %}"></script>
+
+{% csrf_token %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Event</th>
+      <th scope="col">Awarded By</th>
+      <th scope="col">Issued On</th>
+      <th scope="col">SMS</th>
+      <th scope="col">Email</th>
+      <th scope="col">Certificate</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if certificates %}
+    {% for certificate in certificates %}
+    <tr>
+      <th scope="row">{{ certificate.id }}</th>
+      <td>{{ certificate.event.name }}</td>
+      <td>{{ certificate.event.awarded_by }}</td>
+      <td>{{ certificate.created_on|date:settings.DATE_FORMAT }}</td>
+      <td>
+          {% if certificate.sms_sent %}
+            Sent
+          {% elif certificate.sms_available %}
+            Not sent
+          {% elif certificate.sms_available %}
+            Not available
+          {% endif %}
+          <div><a href="javascript:send_sms({{ certificate.id }})">Resend</a></div>
+      </td>
+      <td>
+          {% if certificate.email_sent %}
+            Sent
+          {% elif certificate.email_available %}
+            Not sent
+          {% elif certificate.email_available %}
+            Not available
+          {% endif %}
+          <div><a href="javascript:send_email({{ certificate.id }})">Resend</a></div>
+      </td>
+      <td>
+          <a href="{{ MEDIA_URL }}{{ certificate.file }}" download class="btn btn-primary">Download</a>
+      </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="7">
+            No records found
+        </td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+{#    {% load render_table from django_tables2 %}#}
+{#    {% render_table table %}#}
+{% endblock %}

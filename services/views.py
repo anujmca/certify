@@ -12,7 +12,6 @@ from twilio.rest import Client as TwilioClient
 from datetime import timezone
 import datetime
 from services.views_restful import get_user_by_email_or_phone
-
 from services.utilities import BaseToken
 
 

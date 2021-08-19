@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% block content %}
+{% load static %}
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+{#        Name, Phone, Email, Events, Certificates, Details, Added by, Added On#}
+      <th scope="col">Name</th>
+      <th scope="col">Phone</th>
+      <th scope="col">Email</th>
+      <th scope="col">Events</th>
+      <th scope="col">Certificates</th>
+{#      <th scope="col">Details</th>#}
+      <th scope="col">Added By</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for awardee in awardees %}
+    <tr>
+      <th scope="row">{{ awardee.id }}</th>
+      <td>{{ awardee.first_name }} {{ awardee.last_name }}</td>
+      <td>{{ awardee.profile.phone_number }}</td>
+      <td>{{ awardee.email }}</td>
+      <td>{{ awardee|events|length }}</td>
+      <td>{{ awardee.certificates.all|length }}</td>
+{#      <td>#}
+{#          {% for event in awardee|events %}#}
+{#              {{ event }} - 5 Certificates#}
+{#          {% endfor %}#}
+{#      </td>#}
+      <td>
+          <span data-toggle="tooltip" title="{{ awardee.profile.created_by}}">{{ awardee.profile.created_by.first_name }} {{ awardee.profile.created_by.last_name }}</span>
+          {% if awardee.profile.created_on %} <span class="text-muted">on</span> {{ awardee.profile.created_on|date:settings.DATE_FORMAT }}{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{#    {% load render_table from django_tables2 %}#}
+{#    {% render_table table %}#}
+{% endblock %}
