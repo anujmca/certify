@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from services.decorators import unauthenticated_user, allowed_users
+from services.decorators import unauthenticated_user, allowed_users, public
 from services.models import *
 from django.conf import settings
 import services.utilities as utl
@@ -96,6 +96,17 @@ def certificates_generated(request):
     context = {'content_title': settings.CONTENT_TITLE.CERTIFICATE_GENERATED,
                'events': Event.objects.filter(are_certificates_generated=True).all()}
     return render(request, 'certificates\past_certificates.html', context)
+
+
+@public
+def public_certificate(request, pk):
+    certificate = Certificate.objects.get(pk=pk)
+    filename = certificate.file.name.split('/')[-1]
+    response = HttpResponse(certificate.file, content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+
 
 # class CertificateTableView(tables.SingleTableView):
 #     table_class = CertificateTable

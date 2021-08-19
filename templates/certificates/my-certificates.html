@@ -14,6 +14,7 @@
       <th scope="col">SMS</th>
       <th scope="col">Email</th>
       <th scope="col">Certificate</th>
+      <th scope="col">Share</th>
     </tr>
   </thead>
   <tbody>
@@ -47,11 +48,16 @@
       <td>
           <a href="{{ MEDIA_URL }}{{ certificate.file }}" download class="btn btn-primary">Download</a>
       </td>
+      <td>
+          <a href="javascript:public_certificate_copy_to_clipboard({{ certificate.id }})" download class="cursor-hand" data-toggle="tooltip" title="Copy to clipboard">
+              <span data-feather="copy" ></span>
+          </a>
+      </td>
     </tr>
     {% endfor %}
     {% else %}
     <tr>
-        <td colspan="7">
+        <td colspan="8">
             No records found
         </td>
     </tr>

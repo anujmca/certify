@@ -2,6 +2,13 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from services import utilities as utl
 
+# adding this "public" decorator for future use, in case some handling is required for public url
+def public(view_func):
+    def wrapper_func(request, *args, **kwargs):
+        return view_func(request, *args, **kwargs)
+
+    return wrapper_func
+
 
 def unauthenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):

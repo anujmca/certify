@@ -34,6 +34,8 @@ urlpatterns = [
     # path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
 
     path('awardees', views.awardees, name='awardees'),
+
+    path('public/certificates/<int:pk>', views.public_certificate, name='public_certificate'),
 ]
 
 from django.conf.urls.static import static
