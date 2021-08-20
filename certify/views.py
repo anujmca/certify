@@ -40,10 +40,26 @@ def index(request):
 
 @login_required
 @allowed_users(allowed_roles=[utl.Groups.issuer])
+def events(request):
+    context = {'content_title': settings.CONTENT_TITLE.EVENTS,
+               'events': Event.objects.all()}
+    return render(request, 'events/event_list.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=[utl.Groups.issuer])
 def templates(request):
     context = {'content_title': settings.CONTENT_TITLE.TEMPLATES,
                'templates': Template.objects.all()}
-    return render(request, 'templates.html', context)
+    return render(request, 'templates/templates_list.html', context)
+
+
+@login_required
+@allowed_users(allowed_roles=[utl.Groups.issuer])
+def datasheets(request):
+    context = {'content_title': settings.CONTENT_TITLE.DATASHEETS,
+               'datasheets': DataSheet.objects.all()}
+    return render(request, 'datasheets/datasheet_list.html', context)
 
 
 @login_required

@@ -41,7 +41,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-      <span class="navbar-brand col-md-3 col-lg-1 me-0 px-4" href="#">{{ user.first_name }} {{ user.last_name }}</span>
+      <span class="navbar-brand col-md-auto col-lg-1 me-0 text-center" href="#">{{ user.first_name }} {{ user.last_name }}</span>
       <div class="navbar-nav">
         <div class="nav-item text-nowrap">
           <a class="nav-link px-3" href="/services/logout">Sign out</a>
@@ -63,16 +63,10 @@
               </li>
             {% if request.user|has_group:'issuer' %}
               <li class="nav-item border-top">
-                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.TEMPLATES %}active{% endif %}" href="/templates">
-                  <span data-feather="file"></span>
-                  Templates
-                </a>
-              </li>
-              <li class="nav-item border-top">
-                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATES %}active{% endif %}" href="/certificates">
+                <div class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATES %}active{% endif %}" href="/certificates">
                   <span data-feather="tool"></span>
                   Certificates
-                </a>
+                </div>
                 <ul class="nav-item flex-column">
                   <li class="nav-item">
                     <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATE_SETUP %}active{% endif %}" aria-current="page" href="/certificates/setup">
@@ -86,10 +80,36 @@
                       Generate Certificates
                     </a>
                   </li>
-                    <li class="nav-item">
+                  <li class="nav-item">
                     <a class="nav-link {% if content_title == settings.CONTENT_TITLE.CERTIFICATE_GENERATED %}active{% endif %}" aria-current="page" href="/certificates/generated">
                       <span data-feather="copy"></span>
                         {{ settings.CONTENT_TITLE.CERTIFICATE_GENERATED}}
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item border-top">
+                <div class="nav-link">
+                  <span data-feather="settings"></span>
+                  Maintenance
+                </div>
+                <ul class="nav-item flex-column">
+                  <li class="nav-item">
+                    <a class="nav-link {% if content_title == settings.CONTENT_TITLE.EVENTS %}active{% endif %}" aria-current="page" href="/events">
+                      <span data-feather="layers"></span>
+                      Events
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link {% if content_title == settings.CONTENT_TITLE.TEMPLATES %}active{% endif %}" aria-current="page" href="/templates">
+                      <span data-feather="file"></span>
+                      Templates
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link {% if content_title == settings.CONTENT_TITLE.DATASHEETS %}active{% endif %}" aria-current="page" href="/datasheets">
+                      <span data-feather="grid"></span>
+                      Datasheets
                     </a>
                   </li>
                 </ul>
@@ -108,9 +128,9 @@
               </li>
                 {% endif %}
                 {% if request.user|has_group:'awardee' %}
-                   <li class="nav-item">
+                   <li class="nav-item border-top">
                     <a class="nav-link {% if content_title == settings.CONTENT_TITLE.MY_CERTIFICATES %}active{% endif %}" aria-current="page" href="/mycertificates">
-                      <span data-feather="layers"></span>
+                      <span data-feather="award"></span>
                       My Certificates
                     </a>
                   </li>

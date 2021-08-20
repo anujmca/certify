@@ -47,6 +47,6 @@ function send_email(certificate_id)
 }
 
 function public_certificate_copy_to_clipboard(certificate_id){
-    let public_url = window.location.protocol + "//" + window.location.host + '/public/certificates/' + certificate_id;
+    let public_url = window.location.protocol + "//" + window.location.host + '/public/certificates/' + certificate_id + '/view';
     copyToClipboard(public_url);
 }

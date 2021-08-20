@@ -185,12 +185,13 @@ from types import SimpleNamespace
 CONTENT_TITLE = SimpleNamespace(**{
     'DASHBOARD': 'Dashboard',
     'TEMPLATES': 'Templates',
+    'DATASHEETS': 'Datasheets',
     'CERTIFICATES': 'Certificates',
     'MY_CERTIFICATES': 'Certificates Awarded To Me',
     'CERTIFICATE_SETUP': 'Certificate Setup',
     'CERTIFICATE_GENERATE': 'Certificate Generate',
     'CERTIFICATE_GENERATED': 'Past Certificates',
-    'EVENTS': 'Generate Certificates',
+    'EVENTS': 'Events',
     'AWARDEES': 'Awardees',
     'REPORTS': 'Reports',
 })
