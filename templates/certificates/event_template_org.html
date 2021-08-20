@@ -8,48 +8,43 @@
             Your Existing Templates
           </button>
         </h2>
-        <div id="collapseOne" data-bs-interval="false"  class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+        <div id="collapseOne" data-bs-interval="false" style="width:400px;" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
           <div class="accordion-body">
+          <div id="carouselExampleCaptions" class="carousel-dark carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
+          <div class="carousel-inner">
 
-            <div id="recipeCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner" role="listbox" style="padding-bottom: 5px;">
-                {% for template in templates %}
-                <div class="{% if templates|length > 4 %}carousel-item{% endif %} transition-smooth pull-left
-                            {% if event.template %}
-                                {% if event.template.id == template.id %}active{% endif %}
-                            {% else %}
-                            {% if forloop.first %}active{% endif %}
-                            {% endif %}
-                            " data-bs-interval="false">
-                    <div class="card">
-                        <img src="/static/img/certificate_frame.png" alt="{{template.name}}">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ template.name }}</h5>
-                          <p class="card-text">{{ template.description }}</p>
-                          <input type="radio" {% if event.template.id == template.id %}checked{% endif %} name="existing-template"  class="btn-check {% if event.template.id == template.id %}btn-primary{% endif %} " id="existing-template-{{ template.id }}" autocomplete="off" value="{{ template.id }}">
-                          <label class="btn btn-outline-primary" for="existing-template-{{ template.id }}">Select This</label><br>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+          {% for template in templates %}
+            <div data-bs-interval="false" class="carousel-item {% if forloop.first %}active{% endif %}">
+              <img src="/static/img/certificate_frame.png" class="d-block w-100" alt="...">
+              <div class="carousel-caption d-none d-md-block">
+                <h5>{{ template.name }}</h5>
+                <p>{{ template.description }}</p>
+                <input type="radio" {% if event.template.id == template.id %}checked{% endif %} name="existing-template"  class="btn-check" id="existing-template-{{ template.id }}" autocomplete="off" value="{{ template.id }}">
+                <label class="btn btn-outline-primary" for="existing-template-{{ template.id }}">Select This</label><br>
+              </div>
             </div>
+          {% endfor %}
 
-            {% if templates|length > 4 %}
-            <script type="text/javascript">
-                var display_carousel = true;
-            </script>
-            <button class="carousel-control-prev" style="margin-left:-10px;" type="button" data-bs-target="#recipeCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" style="margin-right:-10px;" type="button" data-bs-target="#recipeCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-            {% endif %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+
+
+
           </div>
         </div>
-      </div>
       </div>
       <div class="accordion-item">
         <h2 class="accordion-header" id="headingTwo">

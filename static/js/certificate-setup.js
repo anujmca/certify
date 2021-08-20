@@ -25,6 +25,20 @@ $( document ).ready(function() {
         goto_step(step_datasheet);
         break;
     }
+
+    let is_carousel_enabled = false;
+
+    try {
+        if(typeof display_carousel != "undefined" && display_carousel == true)
+            is_carousel_enabled = true;
+    }
+    catch(err) {
+      console.log('Template count is less than requirement to render them as carousel');
+    }
+    if(is_carousel_enabled == true)
+        render_crousel();
+    else
+        console.log('Else - Template count is less than requirement to render them as carousel');
 });
 
 function event_information_save()
@@ -68,8 +82,13 @@ function is_uploading_new_template() {
         description = $('#template_description').val(),
         files = $('#event_template_file')[0].files;
 
+    let id = ($('#template_id').length ? $('#template_id').val() : '');
+
+    let isNew = (!id || id == '' || id == undefined);
+
+
     // Check file selected or not
-    return (files.length > 0 && name != '' && description != '');
+    return (!isNew ? isNew : (files.length > 0 && name != '' && description != ''));
 }
 
 function template_save(is_new_template){
@@ -210,4 +229,23 @@ function event_datasheet_save()
             return true;
         }
     });
+}
+
+function render_crousel(){
+    let items = document.querySelectorAll('.carousel .carousel-item');
+
+    items.forEach((el) => {
+        const minPerSlide = 4
+        let next = el.nextElementSibling
+        for (var i=1; i<minPerSlide; i++) {
+            if (!next) {
+                // wrap carousel by using first child
+                next = items[0]
+            }
+            let cloneChild = next.cloneNode(true)
+            el.appendChild(cloneChild.children[0])
+            next = next.nextElementSibling
+        }
+    });
+
 }

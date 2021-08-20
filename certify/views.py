@@ -80,6 +80,15 @@ def certificates(request):
 
 
 @login_required
+@allowed_users(allowed_roles=[utl.Groups.issuer])
+def event_certificates(request, pk):
+    event = Event.objects.get(pk=pk)
+    context = {'content_title': settings.CONTENT_TITLE.CERTIFICATES,
+               'certificates': event.certificates.all().order_by('-created_on')}
+    return render(request, 'certificates.html', context)
+
+
+@login_required
 @allowed_users(allowed_roles=[utl.Groups.awardee])
 def my_certificates(request):
     context = {'content_title': settings.CONTENT_TITLE.MY_CERTIFICATES,
@@ -103,7 +112,7 @@ def certificates_setup(request, pk=None):
 def certificates_generate(request):
     context = {'content_title': settings.CONTENT_TITLE.CERTIFICATE_GENERATE,
                'events': Event.objects.all()}
-    return render(request, 'certificates\certificate_generate.html', context)
+    return render(request, 'certificates/certificate_generate.html', context)
 
 
 @login_required

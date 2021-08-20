@@ -48,7 +48,7 @@
         </td>
         <td id="status_{{ event.id }}">{{ event.status }}</td>
         <td>
-            <div id="action_{{ event.id }}" style="height: 40px;">
+            <div id="action_{{ event.id }}">
             {% if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED %}
             <a href="/certificates/generated" class="btn btn-primary">Details</a>
             <a href="javascript:generate_certificate({{ event.id }})">Regenerate</a>

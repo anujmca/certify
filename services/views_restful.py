@@ -146,15 +146,15 @@ class TemplateList(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, format=None):
         templates = Template.objects.all()
         serializer = TemplateSerializer(templates, many=True)
         return Response(serializer.data)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def post(self, request, format=None):
         serializer = TemplateSerializer(data=request.data)
         if serializer.is_valid():
@@ -176,15 +176,15 @@ class TemplateDetail(APIView):
         except Template.DoesNotExist:
             raise Http404
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, pk, format=None):
         template = self.get_object(pk)
         serializer = TemplateSerializer(template)
         return Response(serializer.data)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def put(self, request, pk, format=None):
         template = self.get_object(pk)
         serializer = TemplateSerializer(template, data=request.data)
@@ -193,8 +193,8 @@ class TemplateDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def patch(self, request, pk, format=None):
         template = self.get_object(pk)
         serializer = TemplateSerializer(template, data=request.data, partial=True)
@@ -203,8 +203,8 @@ class TemplateDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def delete(self, request, pk, format=None):
         template = self.get_object(pk)
         template.delete()
@@ -220,15 +220,15 @@ class DataSheetList(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
     permission_classes = (IsAuthenticated,)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, format=None):
         datasheets = DataSheet.objects.all()
         serializer = DataSheetSerializer(datasheets, many=True)
         return Response(serializer.data)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def post(self, request, format=None):
         serializer = DataSheetSerializer(data=request.data)
         if serializer.is_valid():
@@ -250,15 +250,15 @@ class DataSheetDetail(APIView):
         except DataSheet.DoesNotExist:
             raise Http404
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def get(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         serializer = DataSheetSerializer(datasheet)
         return Response(serializer.data)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def put(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         serializer = DataSheetSerializer(datasheet, data=request.data)
@@ -267,8 +267,8 @@ class DataSheetDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def patch(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         serializer = DataSheetSerializer(datasheet, data=request.data, partial=True)
@@ -277,8 +277,8 @@ class DataSheetDetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @login_required
-    @allowed_users(allowed_roles=[utl.Groups.issuer])
+    # @login_required
+    # @allowed_users(allowed_roles=[utl.Groups.issuer])
     def delete(self, request, pk, format=None):
         datasheet = self.get_object(pk)
         datasheet.delete()
@@ -290,7 +290,7 @@ class DataSheetDetail(APIView):
 @login_required
 @allowed_users(allowed_roles=[utl.Groups.issuer])
 @api_view(['POST'])
-@csrf_exempt
+# @csrf_exempt
 def generate_certificate(request):
     event_id = request.POST.get('event_id')
     event = Event.objects.get(pk=event_id)

@@ -46,7 +46,8 @@ def get_ppt_tokens(template_file):
         if hasattr(shape, 'text'):
             tokens.append(shape.text)
 
-    return tokens.sort()
+    tokens.sort()
+    return tokens
 
 
 def is_valid_email(email):

@@ -24,6 +24,8 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('events', views.events, name='events'),
+    path('events/<int:pk>/certificates', views.event_certificates, name='event_certificates'),
+
     path('templates', views.templates, name='templates'),
     path('datasheets', views.datasheets, name='datasheets'),
     path('certificates', views.certificates, name='certificates'),
