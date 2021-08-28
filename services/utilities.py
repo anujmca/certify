@@ -59,3 +59,34 @@ def is_valid_email(email):
             return False
     except:
         return False
+
+
+# import sys
+# import argparse
+# import os
+# import fnmatch
+# import win32com
+#
+# # import tkinter as Tkinter
+
+from win32com.client import Dispatch
+import pythoncom
+from django.db import models
+from django.core.files import File
+
+def get_jpg_file(file):
+    ppt_dispatch = None
+    output_file_path = None
+    try:
+        pythoncom.CoInitialize()
+        ppt_dispatch = Dispatch('Powerpoint.Application')
+        ppt_dispatch.Presentations.Open(file.path, WithWindow=0)
+        firstSlideRange = ppt_dispatch.Presentations[0].Slides.Range([1])
+        output_file_path = f'c:\\temp\\abc.jpg'
+        firstSlideRange.Export(output_file_path, 'JPG')
+    except:
+        output_file_path = None
+    finally:
+        if ppt_dispatch:
+            ppt_dispatch.Quit()
+    return output_file_path

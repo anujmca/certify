@@ -7,6 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from certify import settings
 from services import utilities
+from django.core.files import File
 
 
 class BaseModel(models.Model):
@@ -45,6 +46,8 @@ class Template(BaseModel):
     description = models.CharField(max_length=400, null=True)
     file = models.FileField(upload_to='templates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/templates/2015/01/30
     tokens = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=None)
+    # pdf_file = models.FileField(upload_to='templates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/templates/2015/01/30
+    # file_jpg = models.FileField(upload_to='templates/%Y/%m/%d/', blank=True, null=True)  # file will be saved to MEDIA_ROOT/templates/2015/01/30
 
     def __str__(self):
         return self.name
@@ -52,6 +55,14 @@ class Template(BaseModel):
     def save(self, *args, **kwargs):
         self.tokens = utilities.get_ppt_tokens(self.file)
         super(Template, self).save(*args, **kwargs)
+
+        # jpg_file_path = utilities.get_jpg_file(self.file)
+        #
+        # if jpg_file_path is not None:
+        #     reopen = open(jpg_file_path, 'rb')
+        #     django_file = File(reopen)
+        #     # self.file_jpg.save('abc.jpg', django_file, save=True)
+        #     reopen.close()
 
 
 class DataSheet(BaseModel):
@@ -146,7 +157,6 @@ class Certificate(BaseModel):
     email_sent = models.BooleanField(null=False, blank=False, default=False)
     file = models.FileField(
         upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
-
 
 # import django_tables2 as tables
 #
