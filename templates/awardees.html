@@ -24,16 +24,16 @@
       <td>{{ awardee.first_name }} {{ awardee.last_name }}</td>
       <td>{{ awardee.phone_number }}</td>
       <td>{{ awardee.email }}</td>
-      <td>{{ awardee|events|length }}</td>
-      <td>{{ awardee.certificates.all|length }}</td>
+      <td>{{ awardee|tenant_specific_events|length }}</td>
+      <td>{{ awardee|tenant_specific_certificates|length }}</td>
 {#      <td>#}
 {#          {% for event in awardee|events %}#}
 {#              {{ event }} - 5 Certificates#}
 {#          {% endfor %}#}
 {#      </td>#}
       <td>
-          <span data-toggle="tooltip" title="{{ awardee.profile.created_by}}">{{ awardee.profile.created_by.first_name }} {{ awardee.profile.created_by.last_name }}</span>
-          {% if awardee.profile.created_on %} <span class="text-muted">on</span> {{ awardee.profile.created_on|date:settings.DATE_FORMAT }}{% endif %}
+          <span data-toggle="tooltip" title="{{ awardee.created_by}}">{{ awardee.created_by.first_name }} {{ awardee.created_by.last_name }}</span>
+          {% if awardee.created_on %} <span class="text-muted">on</span> {{ awardee.created_on|date:settings.DATE_FORMAT }}{% endif %}
       </td>
     </tr>
     {% endfor %}

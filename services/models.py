@@ -4,8 +4,6 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.conf import settings
 User = settings.AUTH_USER_MODEL
-from django.contrib.auth import get_user_model
-PublicUser = get_user_model()
 from django.contrib.postgres.fields import ArrayField
 
 from certify import settings
@@ -13,6 +11,9 @@ from common.models import BaseModel
 from services import utilities
 from django.core.files import File
 from django_tenants.utils import schema_context
+
+from django.contrib.auth import get_user_model
+UserModel = get_user_model()
 
 
 
@@ -171,7 +172,7 @@ class Certificate(BaseModel):
         result = None
         if self.awardee_public_id is not None and self.awardee_public_id > 0:
             with schema_context(settings.PUBLIC_SCHEMA_NAME):
-                result = PublicUser.objects.get(pk=self.awardee_public_id)
+                result = UserModel.objects.get(pk=self.awardee_public_id)
 
         return result
 # import django_tables2 as tables

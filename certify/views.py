@@ -3,11 +3,14 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from public.models import PublicCertificate
+from public.models import PublicCertificate, PublicUser
 from services.decorators import unauthenticated_user, allowed_users, public
 from services.models import *
 from django.conf import settings
 import services.utilities as utl
+from django_tenants.utils import schema_context, connection
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 @unauthenticated_user
@@ -66,9 +69,14 @@ def datasheets(request):
 @login_required
 @allowed_users(allowed_roles=[utl.Groups.issuer])
 def awardees(request):
-    awardee_group = Group.objects.get(name=utl.Groups.awardee)
+    tenant_schema_name = connection.schema_name
+    awardee_list = None
+    with schema_context(settings.PUBLIC_SCHEMA_NAME):
+        awardee_group = Group.objects.get(name=utl.Groups.awardee)
+        awardee_list = list(PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
+            'first_name', 'last_name'))
     context = {'content_title': settings.CONTENT_TITLE.AWARDEES,
-               'awardees': User.objects.filter(groups__in=[awardee_group]).order_by('first_name', 'last_name')}
+               'awardees': awardee_list}
     return render(request, 'awardees.html', context)
 
 

@@ -50,6 +50,35 @@ from services.models import Event
 #
 #         return tenant_updated_by
 
+from django.contrib.auth import get_user_model
+UserModel = get_user_model()
+
+from accounts.models import User as BaseUserModel
+from django_tenants.utils import schema_context, connection
+
+class PublicUser(BaseUserModel):
+    class Meta:
+        proxy = True
+        # managed = False
+
+    # @property
+    # def events(self):
+    #     awardee_events = [certificate.event for certificate in PublicCertificate.objects.filter(awardee=self)]
+    #     return awardee_events
+    #
+    # @property
+    # def certificates(self):
+    #     awardee_certificates = PublicCertificate.objects.filter(awardee=self)
+    #     return awardee_certificates
+
+    def get_tenant_specific_events(self, tenant_schema_name):
+        awardee_events = [certificate.event for certificate in PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name, awardee=self)]
+        return awardee_events
+
+    def get_tenant_specific_certificates(self, tenant_schema_name):
+        awardee_certificates = PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name, awardee=self)
+        return awardee_certificates
+
 
 class PublicCertificate(BaseModel2):
     awardee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="public_certificates")
