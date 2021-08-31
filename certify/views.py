@@ -10,6 +10,7 @@ from django.conf import settings
 import services.utilities as utl
 from django_tenants.utils import schema_context, connection
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
@@ -73,8 +74,9 @@ def awardees(request):
     awardee_list = None
     with schema_context(settings.PUBLIC_SCHEMA_NAME):
         awardee_group = Group.objects.get(name=utl.Groups.awardee)
-        awardee_list = list(PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
-            'first_name', 'last_name'))
+        awardee_list = list(
+            PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
+                'first_name', 'last_name'))
     context = {'content_title': settings.CONTENT_TITLE.AWARDEES,
                'awardees': awardee_list}
     return render(request, 'awardees.html', context)
@@ -101,8 +103,16 @@ def event_certificates(request, pk):
 @allowed_users(allowed_roles=[utl.Groups.awardee])
 def my_certificates(request):
     from public.models import PublicCertificate
+    tenant_schema_name = connection.schema_name
+
     context = {'content_title': settings.CONTENT_TITLE.MY_CERTIFICATES,
-               'certificates': PublicCertificate.objects.filter(awardee=request.user).order_by('-created_on')}
+               'certificates':
+                   PublicCertificate.objects.filter(awardee=request.user).order_by('-created_on')
+                   if tenant_schema_name == settings.PUBLIC_SCHEMA_NAME
+                   else PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name,
+                                                         awardee=request.user).order_by('-created_on')
+               }
+
     return render(request, 'certificates\my-certificates.html', context)
 
 
@@ -137,12 +147,11 @@ def certificates_generated(request):
 def public_certificate(request, pk):
     certificate = PublicCertificate.objects.get(pk=pk)
     filename = certificate.file.name.split('/')[-1]
-    response = HttpResponse(certificate.file, content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
+    response = HttpResponse(certificate.file,
+                            content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     # TODO: Add logic to render certificate on UI
     return response
-
-
 
 # class CertificateTableView(tables.SingleTableView):
 #     table_class = CertificateTable
