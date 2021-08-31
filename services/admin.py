@@ -32,15 +32,15 @@ class DataKeyAdmin(admin.ModelAdmin):
     model = DataKey
 
 
-class ProfileAdmin(admin.ModelAdmin):
-    model = Profile
-    # readonly_fields = ['otp_valid_till']
+# class ProfileAdmin(admin.ModelAdmin):
+#     model = Profile
+#     # readonly_fields = ['otp_valid_till']
 
 class EventAdmin(admin.ModelAdmin):
     model = Event
 
 
-admin.site.register(Profile, ProfileAdmin)
+# admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Template, TemplateAdmin)
 admin.site.register(DataSheet, DataSheetAdmin)
 admin.site.register(Certificate, CertificateAdmin)
@@ -48,22 +48,22 @@ admin.site.register(DataKey, DataKeyAdmin)
 admin.site.register(Event, EventAdmin)
 
 
-class ProfileInline(admin.StackedInline):
-    model = Profile
-    can_delete = False
-    verbose_name_plural = 'Profile'
-    fk_name = 'user'
-
-
-class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, )
-
-    def get_inline_instances(self, request, obj=None):
-        if not obj:
-            return list()
-        return super(CustomUserAdmin, self).get_inline_instances(request, obj)
-
-
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
+# class ProfileInline(admin.StackedInline):
+#     model = Profile
+#     can_delete = False
+#     verbose_name_plural = 'Profile'
+#     fk_name = 'user'
+#
+#
+# class CustomUserAdmin(UserAdmin):
+#     inlines = (ProfileInline, )
+#
+#     def get_inline_instances(self, request, obj=None):
+#         if not obj:
+#             return list()
+#         return super(CustomUserAdmin, self).get_inline_instances(request, obj)
+#
+#
+# admin.site.unregister(User)
+# admin.site.register(User, CustomUserAdmin)
 

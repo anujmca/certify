@@ -1,7 +1,8 @@
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 
-
+from common.utilities import get_user_by_email_or_phone
+from public.models import PublicCertificate
 from .serializers import *
 from django.http import Http404
 from rest_framework.views import APIView
@@ -12,7 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.contrib.auth.models import Group
 
-
 from io import StringIO, BytesIO
 from generators import pptxGenerator as generator
 from .utilities import *
@@ -21,51 +21,60 @@ from services.models import *
 from django.contrib.auth.decorators import login_required
 from .decorators import unauthenticated_user, allowed_users
 import services.utilities as utl
+from common.views import CsrfExemptSessionAuthentication
+from django_tenants.utils import schema_context, connection
+from django.contrib.auth import get_user_model
 
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        return  # To not perform the csrf check previously happening
+User = get_user_model()
+
+
+# class CsrfExemptSessionAuthentication(SessionAuthentication):
+#     def enforce_csrf(self, request):
+#         return  # To not perform the csrf check previously happening
 
 # region Utilities
-def get_user_by_awardee(request, df_awardee):
-    phone = df_awardee[BaseToken.phone_number]
-    email = df_awardee[BaseToken.email_id]
-    email = email if is_valid_email(email) else None
+def get_or_create_public_user_by_awardee(request, df_awardee):
+    tenant_schema_name = connection.schema_name
 
-    user = get_user_by_email_or_phone(email, phone)
-    password = None
+    with schema_context(settings.PUBLIC_SCHEMA_NAME):
+        phone = df_awardee[BaseToken.phone_number]
+        email = df_awardee[BaseToken.email_id]
+        email = email if is_valid_email(email) else None
 
-    if user is None:
-        user_name = email if email else phone if phone else None
-        if user_name and isinstance(user_name, str):
-            password = User.objects.make_random_password() if settings.IS_HARDCODED_PASSWORD_GENERATED == False else 'Gurgaon1'
-            user = User.objects.create_user(username=user_name, password=password)
-            if email is not None:
-                user.email = email
-            user.first_name = df_awardee[BaseToken.first_name]
-            user.last_name = df_awardee[BaseToken.last_name]
+        user = get_user_by_email_or_phone(email, phone)
+        password = None
 
-            # user.groups = [Group.objects.get(name=utl.Groups.awardee)]
-            awardee_group = Group.objects.get(name=utl.Groups.awardee)
-            if user.groups:
-                user.groups.add(awardee_group)
-            else:
-                user.groups = [awardee_group]
-            user.save()
-            profile = Profile.objects.create(user=user)
-            Profile.created_by = request.user
-            profile.phone_number = phone
-            profile.client_user_id = df_awardee[BaseToken.id]
-            profile.save()
-            user.save()
+        if user is None:
+            user_name = email if email else phone if phone else None
+            if user_name and user_name == user_name:  # isinstance(user_name, str): # to check isNan
+                password = User.objects.make_random_password() if settings.IS_HARDCODED_PASSWORD_GENERATED == False else 'Gurgaon1'
+                user = User.objects.create_user(username=user_name, password=password)
+                if email is not None:
+                    user.email = email
+                user.first_name = df_awardee[BaseToken.first_name]
+                user.last_name = df_awardee[BaseToken.last_name]
 
-    return user, password
+                # user.groups = [Group.objects.get(name=utl.Groups.awardee)]
+                awardee_group = Group.objects.get(name=utl.Groups.awardee)
+                if user.groups:
+                    user.groups.add(awardee_group)
+                else:
+                    user.groups = [awardee_group]
+                # user.save()
+                # profile = Profile.objects.create(user=user)
+                # Profile.created_by = request.user
+                # profile.phone_number = phone
+                # profile.client_user_id = df_awardee[BaseToken.id]
+                # profile.save()
+                user.tenant_schema_name = tenant_schema_name
+                user.tenant_created_by_user_id = request.user.id
+                user.phone_number = phone
+                # user.client_user_id = df_awardee[BaseToken.id]
+                user.save()
 
-def get_user_by_email_or_phone(email, phone):
-    try:
-        return User.objects.get(Q(email=email) | Q(profile__phone_number=phone))
-    except User.DoesNotExist:
-        return None
+        return user, password
+
+
 # endregion
 
 # region Event Views
@@ -135,6 +144,8 @@ class EventDetail(APIView):
         event = self.get_object(pk)
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 # endregion
 
 
@@ -209,6 +220,8 @@ class TemplateDetail(APIView):
         template = self.get_object(pk)
         template.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 # endregion
 
 
@@ -283,6 +296,8 @@ class DataSheetDetail(APIView):
         datasheet = self.get_object(pk)
         datasheet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 # endregion
 
 
@@ -321,12 +336,14 @@ def generate_certificate(request):
             target_stream = BytesIO()
             certificate_file.save(target_stream)
 
-            user, password = get_user_by_awardee(request, row)
+            tenant_schema_name = connection.schema_name
+
+            user, password = get_or_create_public_user_by_awardee(request, row)
 
             certificate = None
-            if user is not None and password is None: # existing user
+            if user is not None and password is None:  # existing user
                 try:
-                    certificate = Certificate.objects.get(awardee=user, event=event)
+                    certificate = Certificate.objects.get(awardee_public_id=user.id, event=event)
                 except:
                     certificate = None
 
@@ -336,8 +353,9 @@ def generate_certificate(request):
                 certificate.batch_id = batch_id
 
             certificate.save()
-            certificate.awardee = user
-            certificate.sms_available = False if user is None or user.profile.phone_number is None else True
+            certificate.created_by = request.user
+            certificate.awardee_public_id = None if user is None else user.id
+            certificate.sms_available = False if user is None or user.phone_number is None else True
             certificate.email_available = False if user is None or user.email is None else True
             certificate.data_keys.set(data_keys)
             certificate_file_name = f'{data_sheet_dictionary[BaseToken.first_name]}' \
@@ -350,7 +368,7 @@ def generate_certificate(request):
 
             # send email here
             # if password is not None:
-               # send the password also in that email
+            # send the password also in that email
 
         event.awardee_count = awardee_count
         event.are_certificates_generated = True
@@ -361,5 +379,43 @@ def generate_certificate(request):
         data = {'id': event.id, 'result': 'failure'}
         return Response(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@login_required
+@allowed_users(allowed_roles=[utl.Groups.issuer])
+@api_view(['POST'])
+# @csrf_exempt
+def publish_certificate(request):
+    event_id = request.POST.get('event_id')
+    event = Event.objects.get(pk=event_id)
+    if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED and event.certificates:
+        for certificate in event.certificates.filter(status=Certificate.STATUSES.UNPUBLISHED):
+            if certificate.awardee is not None:
+                awardee = certificate.awardee
+                event_name = certificate.event.name
+                sms_available = certificate.sms_available
+                email_available = certificate.email_available
+                file = certificate.file
+                tenant_schema_name = connection.schema_name
+                awarded_by_user_id = certificate.created_by.id
+                tenant_event_id = certificate.event.id
+
+                with schema_context(settings.PUBLIC_SCHEMA_NAME):
+                    public_certificate = PublicCertificate(awardee=awardee, event_name=event.name,
+                                                           sms_available=sms_available, email_available=email_available,
+                                                           file=file
+                                                           )
+                    public_certificate.tenant_schema_name = tenant_schema_name
+                    public_certificate.awarded_by_user_id = awarded_by_user_id
+                    public_certificate.tenant_event_id = tenant_event_id
+
+                    public_certificate.save()
+
+                certificate.status = Certificate.STATUSES.PUBLISHED
+                certificate.save()
+        data = {'id': event.id, 'result': 'success'}
+        return Response(data=data, status=status.HTTP_200_OK)
+    else:
+        data = {'id': event.id, 'result': 'failure'}
+        return Response(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # endregion

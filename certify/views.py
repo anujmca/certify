@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
+from public.models import PublicCertificate
 from services.decorators import unauthenticated_user, allowed_users, public
 from services.models import *
 from django.conf import settings
@@ -91,8 +92,9 @@ def event_certificates(request, pk):
 @login_required
 @allowed_users(allowed_roles=[utl.Groups.awardee])
 def my_certificates(request):
+    from public.models import PublicCertificate
     context = {'content_title': settings.CONTENT_TITLE.MY_CERTIFICATES,
-               'certificates': Certificate.objects.filter(awardee=request.user).order_by('-created_on')}
+               'certificates': PublicCertificate.objects.filter(awardee=request.user).order_by('-created_on')}
     return render(request, 'certificates\my-certificates.html', context)
 
 
@@ -125,10 +127,11 @@ def certificates_generated(request):
 
 @public
 def public_certificate(request, pk):
-    certificate = Certificate.objects.get(pk=pk)
+    certificate = PublicCertificate.objects.get(pk=pk)
     filename = certificate.file.name.split('/')[-1]
     response = HttpResponse(certificate.file, content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    # TODO: Add logic to render certificate on UI
     return response
 
 

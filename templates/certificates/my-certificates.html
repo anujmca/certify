@@ -8,6 +8,7 @@
   <thead>
     <tr>
       <th scope="col">#</th>
+      <th scope="col">Company</th>
       <th scope="col">Event</th>
       <th scope="col">Awarded By</th>
       <th scope="col">Issued On</th>
@@ -22,6 +23,7 @@
     {% for certificate in certificates %}
     <tr>
       <th scope="row">{{ certificate.id }}</th>
+      <td>{{ certificate.tenant }}</td>
       <td>{{ certificate.event.name }}</td>
       <td>{{ certificate.event.awarded_by }}</td>
       <td>{{ certificate.created_on|date:settings.DATE_FORMAT }}</td>

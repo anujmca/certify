@@ -11,70 +11,76 @@ from random import randint
 from twilio.rest import Client as TwilioClient
 from datetime import timezone
 import datetime
-from services.views_restful import get_user_by_email_or_phone
+from common.utilities import get_user_by_email_or_phone
 from services.utilities import BaseToken
-
+from django_tenants.utils import schema_context, connection
 
 def login(request):
-    if request.method == "POST":
-        email_or_phone = request.POST['email_or_phone']
-        if 'sign-in' in request.POST:
-            password = request.POST['password']
+    tenant_schema_name = connection.schema_name
 
-            # check if user has entered correct credentials
-            # user = authenticate(request=request, email_or_phone=email_or_phone, password=password)
-            authBackend = CustomAuthenticationBackend()
-            user = authBackend.authenticate(request=request, email_or_phone=email_or_phone, password=password)
+    with schema_context(tenant_schema_name):
+        if request.method == "POST":
+            email_or_phone = request.POST['email_or_phone']
+            if 'sign-in' in request.POST:
+                password = request.POST['password']
 
-            if user is not None and user.is_authenticated:
-                django_login(request, user)
-                next_url = request.GET.get('next')
-                return redirect(next_url if next_url else '/')
-            else:
+                # check if user has entered correct credentials
+                # user = authenticate(request=request, email_or_phone=email_or_phone, password=password)
+                authBackend = CustomAuthenticationBackend()
+                user = authBackend.authenticate(request=request, email_or_phone=email_or_phone, password=password)
+
+                if user is not None and user.is_authenticated:
+                    django_login(request, user)
+                    next_url = request.GET.get('next')
+                    return redirect(next_url if next_url else '/')
+                else:
+                    return redirect('/login')
+
+            elif 'request-otp' in request.POST:
+                otp = 1234
+                if settings.IS_HARDCODED_OTP == False:
+                    otp = randint(1000, 9999)
+
+                    account_sid = 'AC11de2df9f81f5b40d469bd0c8b5ccfd7'
+                    auth_token = '5f9b586fc93ef34310ae7bef1c11e793'
+                    client = TwilioClient(account_sid, auth_token)
+                    message = client.messages.create(
+                        body=f'{otp} is your OTP for certify, valid for next 15 minutes',
+                        from_='+12512418305',
+                        to=email_or_phone
+                    )
+
+                dt = datetime.datetime.now(timezone.utc)
+                utc_time = dt.replace(tzinfo=timezone.utc)
+
+                user = get_user_by_email_or_phone(email_or_phone, email_or_phone)
+                if user:
+                    user.otp = otp
+                    user.otp_valid_till = utc_time + datetime.timedelta(minutes=1)
+                    user.save()
+
+                    context = {'otp_sent': True,
+                               'email_or_phone': email_or_phone}
+
+                    request.session['redirect-context'] = context
                 return redirect('/login')
+            elif 'verify-otp' in request.POST:
+                otp = request.POST['otp']
+                authBackend = CustomAuthenticationBackend()
+                user = authBackend.authenticate(request=request, email_or_phone=email_or_phone, otp=otp)
 
-        elif 'request-otp' in request.POST:
-            otp = 1234
-            if settings.IS_HARDCODED_OTP == False:
-                otp = randint(1000, 9999)
-
-                account_sid = 'AC11de2df9f81f5b40d469bd0c8b5ccfd7'
-                auth_token = '5f9b586fc93ef34310ae7bef1c11e793'
-                client = TwilioClient(account_sid, auth_token)
-                message = client.messages.create(
-                    body=f'{otp} is your OTP for certify, valid for next 15 minutes',
-                    from_='+12512418305',
-                    to=email_or_phone
-                )
-
-            dt = datetime.datetime.now(timezone.utc)
-            utc_time = dt.replace(tzinfo=timezone.utc)
-
-            user = get_user_by_email_or_phone(email_or_phone, email_or_phone)
-            if user:
-                user.profile.otp = otp
-                user.profile.otp_valid_till = utc_time + datetime.timedelta(minutes=1)
-                user.profile.save()
-
-                context = {'otp_sent': True,
-                           'email_or_phone': email_or_phone}
-
-                request.session['redirect-context'] = context
-            return redirect('/login')
-        elif 'verify-otp' in request.POST:
-            otp = request.POST['otp']
-            authBackend = CustomAuthenticationBackend()
-            user = authBackend.authenticate(request=request, email_or_phone=email_or_phone, otp=otp)
-
-            if user is not None and user.is_authenticated:
-                django_login(request, user)
-                next_url = request.GET.get('next')
-                return redirect(next_url if next_url else '/')
-            else:
-                return redirect('/login')
+                if user is not None and user.is_authenticated:
+                    django_login(request, user)
+                    next_url = request.GET.get('next')
+                    return redirect(next_url if next_url else '/')
+                else:
+                    return redirect('/login')
 
 
 def logout(request):
-    if request.user is not None and request.user.is_authenticated:
-        django_logout(request)
-    return redirect('/')
+    tenant_schema_name = connection.schema_name
+
+    with schema_context(tenant_schema_name):
+        if request.user is not None and request.user.is_authenticated:
+            django_logout(request)
+        return redirect('/')

@@ -2,43 +2,40 @@ from datetime import datetime
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+User = settings.AUTH_USER_MODEL
+from django.contrib.auth import get_user_model
+PublicUser = get_user_model()
 from django.contrib.postgres.fields import ArrayField
 
 from certify import settings
+from common.models import BaseModel
 from services import utilities
 from django.core.files import File
+from django_tenants.utils import schema_context
 
 
-class BaseModel(models.Model):
-    """
-    Abstract database model. Extend this to create models.
-    """
 
-    class Meta:
-        abstract = True
-
-    created_on = models.DateTimeField(auto_now_add=True, db_index=True, editable=False,
-                                      help_text='Datetime on which this record was created.')
-    updated_on = models.DateTimeField(auto_now=True, null=True, blank=True, editable=False,
-                                      help_text='Datetime on which this record was last modified.')
-
-    created_by = models.ForeignKey(User, null=True, related_name='%(class)s_created', on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(User, null=True, blank=True, related_name='%(class)s_updated',
-                                   on_delete=models.CASCADE)
-
-    is_deleted = models.BooleanField(null=False, default=False)
-
-
-class Profile(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    phone_number = models.CharField(max_length=100, null=False, unique=True)
-    client_user_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
-    otp = models.CharField(max_length=10, null=True, blank=True, unique=False, )
-    otp_valid_till = models.DateTimeField(null=True, blank=True, editable=True, help_text="UTC Time")
-
-    def __str__(self):
-        return self.user.email
+# class BaseModel(models.Model):
+#     """
+#     Abstract database model. Extend this to create models.
+#     """
+#
+#     class Meta:
+#         abstract = True
+#
+#     created_on = models.DateTimeField(auto_now_add=True, db_index=True, editable=False,
+#                                       help_text='Datetime on which this record was created.')
+#     updated_on = models.DateTimeField(auto_now=True, null=True, blank=True, editable=False,
+#                                       help_text='Datetime on which this record was last modified.')
+#
+#     created_by = models.ForeignKey(User, null=True, related_name='%(class)s_created', on_delete=models.CASCADE)
+#     updated_by = models.ForeignKey(User, null=True, blank=True, related_name='%(class)s_updated',
+#                                    on_delete=models.CASCADE)
+#
+#     is_deleted = models.BooleanField(null=False, default=False)
+#
+#
 
 
 class Template(BaseModel):
@@ -147,7 +144,12 @@ class Event(BaseModel):
 
 
 class Certificate(BaseModel):
-    awardee = models.ForeignKey(User, related_name="certificates", null=True, blank=True, on_delete=models.CASCADE)
+    class STATUSES(models.TextChoices):
+        UNPUBLISHED = 'UN', 'Unpublished'
+        PUBLISHED = 'PB', 'Published'
+
+    # awardee = models.ForeignKey(User, related_name="certificates", null=True, blank=True, on_delete=models.CASCADE)
+    awardee_public_id = models.BigIntegerField(null=True, blank=True, default=None) # Kept it nullable to allow creating certificates without user
     event = models.ForeignKey(Event, related_name="certificates", null=False, blank=False, on_delete=models.CASCADE)
     batch_id = models.IntegerField()
     data_keys = models.ManyToManyField(DataKey, related_name="certificates")
@@ -155,9 +157,23 @@ class Certificate(BaseModel):
     email_available = models.BooleanField(null=False, blank=False, default=False)
     sms_sent = models.BooleanField(null=False, blank=False, default=False)
     email_sent = models.BooleanField(null=False, blank=False, default=False)
+    status = models.CharField(
+        max_length=2,
+        choices=STATUSES.choices,
+        default=STATUSES.UNPUBLISHED,
+        null=False, blank=False,
+    )
     file = models.FileField(
         upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
 
+    @property
+    def awardee(self):
+        result = None
+        if self.awardee_public_id is not None and self.awardee_public_id > 0:
+            with schema_context(settings.PUBLIC_SCHEMA_NAME):
+                result = PublicUser.objects.get(pk=self.awardee_public_id)
+
+        return result
 # import django_tables2 as tables
 #
 # class CertificateTable(tables.Table):

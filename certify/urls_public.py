@@ -18,28 +18,14 @@ from django.urls import include, path
 from certify import views
 
 urlpatterns = [
-    path('services/', include('services.urls')),
-    path('public/', include('public.urls')),
     path('admin/', admin.site.urls),
+    path('public/', include('public.urls')),
+    path('services/', include('services.urls')),
+
     path('login', views.login, name='login'),
     path('', views.index, name='index'),
 
-    path('events', views.events, name='events'),
-    path('events/<int:pk>/certificates', views.event_certificates, name='event_certificates'),
-
-    path('templates', views.templates, name='templates'),
-    path('datasheets', views.datasheets, name='datasheets'),
-    path('certificates', views.certificates, name='certificates'),
     path('mycertificates', views.my_certificates, name='mycertificates'),
-    # path('certificates', views.CertificateTableView, name='certificates'),
-    path('certificates/setup', views.certificates_setup, name='certificates_setup'),
-    path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
-    path('certificates/generate', views.certificates_generate, name='certificates_generate'),
-    path('certificates/generated', views.certificates_generated, name='certificates_generated'),
-    # path('certificates/setup/<int:pk>', views.certificates_setup, name='certificates_setup'),
-
-    path('awardees', views.awardees, name='awardees'),
-
     path('public/certificates/<int:pk>/view', views.public_certificate, name='public_certificate'),
     path('public/certificates/<int:pk>/download', views.public_certificate, name='public_certificate'),
 ]

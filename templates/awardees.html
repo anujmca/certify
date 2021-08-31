@@ -22,7 +22,7 @@
     <tr>
       <th scope="row">{{ awardee.id }}</th>
       <td>{{ awardee.first_name }} {{ awardee.last_name }}</td>
-      <td>{{ awardee.profile.phone_number }}</td>
+      <td>{{ awardee.phone_number }}</td>
       <td>{{ awardee.email }}</td>
       <td>{{ awardee|events|length }}</td>
       <td>{{ awardee.certificates.all|length }}</td>

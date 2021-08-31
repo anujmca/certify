@@ -10,9 +10,10 @@ from pandas import *
 from generators import pptxGenerator as generator
 from services.models import *
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
-from services.views_restful import get_user_by_email_or_phone
+from common.utilities import get_user_by_email_or_phone
 
 
 class CustomAuthenticationBackend(MiddlewareMixin):
@@ -25,7 +26,7 @@ class CustomAuthenticationBackend(MiddlewareMixin):
                     return user
                 return None
             elif otp:
-                return user if user.profile.otp == otp else None
+                return user if user.otp == otp else None
         except User.DoesNotExist:
             return None
 
@@ -46,8 +47,8 @@ class CustomAuthenticationBackend(MiddlewareMixin):
 #         if user.is_authenticated:
 #             try:
 #                 # Set preferences
-#                 timezone.activate(user.profile.timezone)
-#                 translation.activate(user.profile.language)
+#                 timezone.activate(user.timezone)
+#                 translation.activate(user.language)
 #
 #             except PortalUser.DoesNotExist:
 #                 pass

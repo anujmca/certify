@@ -41,7 +41,16 @@ SHARED_APPS = [
 
     # 'services',
     # 'django_tables2',
-    'tenant'
+    'tenant',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'public',
+    'common',
+    'accounts',
 ]
 
 TENANT_APPS = [
@@ -57,13 +66,20 @@ TENANT_APPS = [
     # 'tenant'
 
     'rest_framework',
+    'common',
+    'accounts',
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 TENANT_MODEL = "tenant.Client"  # app.Model
-
 TENANT_DOMAIN_MODEL = "tenant.Domain"  # app.Model
+
+ROOT_URLCONF = 'certify.urls'
+PUBLIC_SCHEMA_URLCONF = 'certify.urls_public'
+SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+PUBLIC_SCHEMA_NAME = 'public'
+
 
 MIDDLEWARE = [
     'django_tenants.middleware.main.TenantMainMiddleware',
@@ -80,7 +96,7 @@ MIDDLEWARE = [
 # AUTHENTICATION_BACKENDS=['certify.middleware.CustomAuthenticationBackend',]
 
 
-ROOT_URLCONF = 'certify.urls'
+
 
 TEMPLATES = [
     {
@@ -112,7 +128,7 @@ WSGI_APPLICATION = 'certify.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
-        'NAME': 'certify',
+        'NAME': 'certify3',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
@@ -176,7 +192,7 @@ MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
 
-# AUTH_USER_MODEL = 'services.CertifyUser'
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # region CUSTOM CONSTANTS
@@ -227,3 +243,4 @@ REST_FRAMEWORK = {
     # ]
 }
 # APPEND_SLASH = True
+

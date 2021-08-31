@@ -51,6 +51,7 @@
             <div id="action_{{ event.id }}">
             {% if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED %}
             <a href="/certificates/generated" class="btn btn-primary">Details</a>
+            <a href="javascript:publish_certificates({{ event.id }})" class="btn btn-primary"  data-toggle="tooltip" title="Publish certificates to all awardee">Publish</a>
             <a href="javascript:generate_certificate({{ event.id }})">Regenerate</a>
             {% elif event.status == settings.EVENT_STATUS.READY_TO_GENERATE %}
             <button onclick="generate_certificate({{ event.id }})" class="btn btn-primary">Generate</button>
