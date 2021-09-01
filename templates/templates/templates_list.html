@@ -2,7 +2,7 @@
 {% block content %}
     {% for template in templates %}
     <div class="card" style="width: 18rem;margin-right:10px;float:left;">
-      <img src="/static/img/certificate_frame.png" class="card-img-top">
+      <img src="{% if template.file_thumbnail %}{{ MEDIA_URL }}{{ template.file_thumbnail }}{% else %}/static/img/certificate_frame.png{% endif %}" class="card-img-top">
       <div class="card-body">
         <h5 class="card-title">{{ template.name }}</h5>
         <p class="card-text">{{ template.description }}</p>

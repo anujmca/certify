@@ -22,7 +22,7 @@
                             {% endif %}
                             " data-bs-interval="false">
                     <div class="card">
-                        <img src="/static/img/certificate_frame.png" alt="{{template.name}}">
+                        <img src="{% if template.file_thumbnail %}{{ MEDIA_URL }}{{ template.file_thumbnail }}{% else %}/static/img/certificate_frame.png{% endif %}" alt="{{template.name}}">
                         <div class="card-body">
                           <h5 class="card-title">{{ template.name }}</h5>
                           <p class="card-text">{{ template.description }}</p>

@@ -1,8 +1,13 @@
+import os
 from datetime import datetime
+from random import randint
 
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.conf import settings
+
+from common.utilities import path_leaf
+
 User = settings.AUTH_USER_MODEL
 from django.contrib.postgres.fields import ArrayField
 
@@ -46,6 +51,8 @@ class Template(BaseModel):
     tokens = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=None)
     # pdf_file = models.FileField(upload_to='templates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/templates/2015/01/30
     # file_jpg = models.FileField(upload_to='templates/%Y/%m/%d/', blank=True, null=True)  # file will be saved to MEDIA_ROOT/templates/2015/01/30
+    file_thumbnail = models.FileField(upload_to='templates/thumbnails/%Y/%m/%d/', blank=True, null=True, max_length=500)  # file will be saved to MEDIA_ROOT/templates/thumbnails/2015/01/30
+
 
     def __str__(self):
         return self.name
@@ -54,13 +61,23 @@ class Template(BaseModel):
         self.tokens = utilities.get_ppt_tokens(self.file)
         super(Template, self).save(*args, **kwargs)
 
-        # jpg_file_path = utilities.get_jpg_file(self.file)
-        #
-        # if jpg_file_path is not None:
-        #     reopen = open(jpg_file_path, 'rb')
-        #     django_file = File(reopen)
-        #     # self.file_jpg.save('abc.jpg', django_file, save=True)
-        #     reopen.close()
+        thumbnail_file_path = utilities.get_jpg_file(self.file)
+
+        if thumbnail_file_path is not None:
+            reopen = None
+            try:
+                # reopen = open(thumbnail_temp_file_path, 'rb')
+                # django_file = File(reopen)
+                # thumbnail_name = path_leaf(thumbnail_file_path)
+                # self.file_thumbnail.save(thumbnail_name, django_file, save=True)
+                # self.file_thumbnail.save(thumbnail_name, django_file, save=True)
+                self.file_thumbnail.name = thumbnail_file_path
+                super(Template, self).save(*args, **kwargs)
+
+            finally:
+                if reopen:
+                    reopen.close()
+                # os.remove(thumbnail_file_path)
 
 
 class DataSheet(BaseModel):

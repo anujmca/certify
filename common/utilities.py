@@ -1,3 +1,5 @@
+import ntpath
+
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.db.models import Q
@@ -27,3 +29,8 @@ def get_tenant_user_by_public_user(tenant_users, public_user):
     except:
         tenant_user = None
     return tenant_user
+
+
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)

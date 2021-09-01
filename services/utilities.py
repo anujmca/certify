@@ -1,14 +1,18 @@
+import os
+
 from pandas import *
 from pptx import Presentation
 import re
 
 from enum import Enum
+import uuid
 
 
 # from django.db.models import Q
 # # from pandas import *
 # from services.models import *
 # from services.models import Profile
+from certify import settings
 
 
 class BaseToken:
@@ -76,17 +80,20 @@ from django.core.files import File
 
 def get_jpg_file(file):
     ppt_dispatch = None
-    output_file_path = None
+    temp_thumbnail_path = None
     try:
         pythoncom.CoInitialize()
         ppt_dispatch = Dispatch('Powerpoint.Application')
         ppt_dispatch.Presentations.Open(file.path, WithWindow=0)
         firstSlideRange = ppt_dispatch.Presentations[0].Slides.Range([1])
-        output_file_path = f'c:\\temp\\abc.jpg'
-        firstSlideRange.Export(output_file_path, 'JPG')
+        unique_seed = str(uuid.uuid1())
+        thumbnails_dir = os.path.join(settings.MEDIA_ROOT, 'templates', 'thumbnails')
+        os.makedirs(thumbnails_dir, exist_ok=True)
+        temp_thumbnail_path = os.path.join(thumbnails_dir, file.name.split('/')[-1].split('.')[0] + "_" + unique_seed + ".jpg")
+        firstSlideRange.Export(temp_thumbnail_path, 'JPG')
     except:
-        output_file_path = None
+        temp_thumbnail_path = None
     finally:
         if ppt_dispatch:
             ppt_dispatch.Quit()
-    return output_file_path
+    return temp_thumbnail_path
