@@ -1,0 +1,22 @@
+{% extends 'unauthenticated/base_unauthenticated.html' %}
+{% block content %}
+{% load static %}
+<div style="text-align: center">
+
+<object id="display_certificate" width="75%" height="548px;" type="application/pdf" data="{% url 'public_certificate_view_raw' certificate.id %}?#zoom=75&scrollbar=0&toolbar=0&navpanes=0"
+        WMODE="transparent"
+        style="overflow: hidden"
+        >
+    <p style="float:left;text-align: left">
+        Your browser is not compatible to inline view of the pdf. <br>
+        Click <a href="{% url 'public_certificate_view_raw' certificate.id %}" target="_self">here</a> to see the certificate
+    </p>
+</object>
+</div>
+
+{#<iframe src="/public/certificates/{{ certificate.id }}/view/raw" style="width:100%; height:550px;" frameborder="0">#}
+{##}
+{#</iframe>#}
+
+{#<iframe src="http://docs.google.com/gview?url=http://certify.com:8000/public/certificates/{{ certificate.id }}/view/raw&embedded=true" style="width:718px; height:700px;" frameborder="0"></iframe>#}
+{% endblock %}

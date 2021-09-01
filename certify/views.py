@@ -142,15 +142,7 @@ def certificates_generated(request):
     return render(request, 'certificates\past_certificates.html', context)
 
 
-@public
-def public_certificate(request, pk):
-    certificate = PublicCertificate.objects.get(pk=pk)
-    filename = certificate.file.name.split('/')[-1]
-    response = HttpResponse(certificate.file,
-                            content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
-    response['Content-Disposition'] = 'attachment; filename=%s' % filename
-    # TODO: Add logic to render certificate on UI
-    return response
+
 
 # class CertificateTableView(tables.SingleTableView):
 #     table_class = CertificateTable
