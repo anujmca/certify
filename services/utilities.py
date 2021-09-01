@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 from pandas import *
 from pptx import Presentation
@@ -97,3 +98,64 @@ def get_jpg_file(file):
         if ppt_dispatch:
             ppt_dispatch.Quit()
     return temp_thumbnail_path
+
+
+def convert_ppt_to_pdf(ppt, pdf_filename):
+    unique_seed = str(uuid.uuid1())
+    temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+    os.makedirs(temp_dir, exist_ok=True)
+    temp_ppt_file_path = os.path.join(temp_dir, unique_seed + ".pptx")
+    ppt.save(temp_ppt_file_path)
+
+    todays_date = date.today()
+    certificate_dir = os.path.join(settings.MEDIA_ROOT, 'certificates', str(todays_date.year), str(todays_date.month), str(todays_date.day))
+    os.makedirs(certificate_dir, exist_ok=True)
+    pdf_file_path = os.path.join(certificate_dir, pdf_filename)
+
+    # return_pdf_file_path = PPTtoPDF(temp_ppt_file_path, pdf_file_path)
+
+    ppt_dispatch = None
+    deck = None
+    try:
+        pythoncom.CoInitialize()
+        ppt_dispatch = Dispatch('Powerpoint.Application')
+        deck = ppt_dispatch.Presentations.Open(temp_ppt_file_path, WithWindow=0)
+        # ppt_dispatch.Presentations[0].SaveAs(pdf_file_path, 32)
+        deck.SaveAs(pdf_file_path, 32)
+    except:
+        pdf_file_path = None
+    finally:
+        if deck:
+            deck.Close()
+        if ppt_dispatch:
+            ppt_dispatch.Quit()
+        os.remove(temp_ppt_file_path)
+    return pdf_file_path
+
+
+
+# import comtypes.client
+
+# def PPTtoPDF(inputFileName, outputFileName, formatType = 32):
+#     powerpoint = None
+#     deck = None
+#     return_pdf_file_path = None
+#     try:
+#         pythoncom.CoInitialize()
+#         powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
+#         # powerpoint.Visible = 0
+#
+#         if outputFileName[-3:] != 'pdf':
+#             outputFileName = outputFileName + ".pdf"
+#         deck = powerpoint.Presentations.Open(inputFileName)
+#         deck.SaveAs(outputFileName, formatType) # formatType = 32 for ppt to pdf
+#         return_pdf_file_path =  outputFileName
+#     except Exception as ex:
+#         return_pdf_file_path = None
+#     finally:
+#         if deck:
+#             deck.Close()
+#         if powerpoint:
+#             powerpoint.Quit()
+#
+#     return return_pdf_file_path

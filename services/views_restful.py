@@ -338,8 +338,8 @@ def generate_certificate(request):
                                                   data_sheet_dictionary=data_sheet_dictionary)
             # certificate_file.save(settings.MEDIA_ROOT + '')
 
-            target_stream = BytesIO()
-            certificate_file.save(target_stream)
+            # target_stream = BytesIO()
+            # certificate_file.save(target_stream)
 
             tenant_schema_name = connection.schema_name
 
@@ -365,10 +365,12 @@ def generate_certificate(request):
             certificate.data_keys.set(data_keys)
             certificate_file_name = f'{data_sheet_dictionary[BaseToken.first_name]}' \
                                     f'_{data_sheet_dictionary[BaseToken.last_name]}' \
-                                    f'_{event.id}_{batch_id}.pptx'
+                                    f'_{event.id}_{batch_id}.pdf'
 
             # certificate.file.save(data_sheet_dictionary['employee_name'] + '_' + str(batch_id) + '.pptx', target_stream)
-            certificate.file.save(certificate_file_name, target_stream)
+            # certificate.file.save(certificate_file_name, target_stream)
+            certificate_pdf_file = convert_ppt_to_pdf(certificate_file, certificate_file_name)
+            certificate.file.name = certificate_pdf_file
             certificate.save()
 
         event.awardee_count = awardee_count
