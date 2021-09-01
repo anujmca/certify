@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 
-from common.utilities import get_user_by_email_or_phone
+from common.utilities import get_user_by_email_or_phone, get_tenant_user_by_public_user
 from public.models import PublicCertificate
 from .serializers import *
 from django.http import Http404
@@ -55,11 +55,7 @@ def get_or_create_public_user_by_awardee(request, df_awardee):
                 user.last_name = df_awardee[BaseToken.last_name]
 
                 # user.groups = [Group.objects.get(name=utl.Groups.awardee)]
-                awardee_group = Group.objects.get(name=utl.Groups.awardee)
-                if user.groups:
-                    user.groups.add(awardee_group)
-                else:
-                    user.groups = [awardee_group]
+                assign_awardee_group(user)
                 # user.save()
                 # profile = Profile.objects.create(user=user)
                 # Profile.created_by = request.user
@@ -73,6 +69,15 @@ def get_or_create_public_user_by_awardee(request, df_awardee):
                 user.save()
 
         return user, password
+
+
+def assign_awardee_group(user):
+    awardee_group = Group.objects.get(name=utl.Groups.awardee)
+    if user.groups:
+        if not user.groups.filter(pk=awardee_group.id).exists():
+            user.groups.add(awardee_group)
+    else:
+        user.groups = [awardee_group]
 
 
 # endregion
@@ -366,10 +371,6 @@ def generate_certificate(request):
             certificate.file.save(certificate_file_name, target_stream)
             certificate.save()
 
-            # send email here
-            # if password is not None:
-            # send the password also in that email
-
         event.awardee_count = awardee_count
         event.are_certificates_generated = True
         event.save()
@@ -400,15 +401,29 @@ def publish_certificate(request):
                 tenant_event_id = certificate.event.id
 
                 with schema_context(settings.PUBLIC_SCHEMA_NAME):
-                    public_certificate = PublicCertificate(awardee=awardee, event_name=event.name,
-                                                           sms_available=sms_available, email_available=email_available,
-                                                           file=file
-                                                           )
-                    public_certificate.tenant_schema_name = tenant_schema_name
-                    public_certificate.awarded_by_user_id = awarded_by_user_id
-                    public_certificate.tenant_event_id = tenant_event_id
+                    if not PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name, awardee=awardee, tenant_event_id=tenant_event_id).exists():
+                        public_certificate = PublicCertificate(awardee=awardee, event_name=event_name,
+                                                               sms_available=sms_available, email_available=email_available,
+                                                               file=file
+                                                               )
+                        public_certificate.tenant_schema_name = tenant_schema_name
+                        public_certificate.awarded_by_user_id = awarded_by_user_id
+                        public_certificate.tenant_event_id = tenant_event_id
 
-                    public_certificate.save()
+                        public_certificate.save()
+
+                        # TODO: send email/sms here
+                        # if password is not None:
+                        # send the password also in that email
+
+                # Todo: in case this awardee is also a user in this tenant, then assign the tenant user as "Awardee" role
+
+                if awardee is not None:
+                    tenant_user = get_tenant_user_by_public_user(User.objects, awardee)
+                    if tenant_user is not None and tenant_user.public_user_id is None:
+                        tenant_user.public_user_id = awardee.id
+                        assign_awardee_group(tenant_user)
+                        tenant_user.save()
 
                 certificate.status = Certificate.STATUSES.PUBLISHED
                 certificate.save()

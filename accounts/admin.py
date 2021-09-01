@@ -14,6 +14,7 @@ class CustomUserAdmin(UserAdmin):
                     'phone_number',
                     'otp',
                     'otp_valid_till',
+                    'public_user_id',
                 ),
             },
         ),

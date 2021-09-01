@@ -48,6 +48,7 @@ class User(AbstractUser, BaseModel2):
     phone_number = models.CharField(max_length=100, null=True, blank=True, unique=True)
     otp = models.CharField(max_length=10, null=True, blank=True, unique=False, )
     otp_valid_till = models.DateTimeField(null=True, blank=True, editable=True, help_text="UTC Time")
+    public_user_id = models.BigIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.email

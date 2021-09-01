@@ -20,5 +20,8 @@ class Domain(DomainMixin):
     def subdomain(self):
         return self.domain.split('.')[0]
 
+    def get_subdomain(self):
+        return self.domain.split('.')[0]
+
     def __str__(self):
         return self.domain

@@ -89,6 +89,18 @@
                 </ul>
               </li>
               <li class="nav-item border-top">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.AWARDEES %}active{% endif %}"  href="/awardees">
+                  <span data-feather="users"></span>
+                  Awardees
+                </a>
+              </li>
+              <li class="nav-item border-top">
+                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.REPORTS %}active{% endif %}"  href="#">
+                  <span data-feather="bar-chart-2"></span>
+                  Reports
+                </a>
+              </li>
+              <li class="nav-item border-top">
                 <div class="nav-link">
                   <span data-feather="settings"></span>
                   Maintenance
@@ -113,18 +125,6 @@
                     </a>
                   </li>
                 </ul>
-              </li>
-              <li class="nav-item border-top">
-                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.AWARDEES %}active{% endif %}"  href="/awardees">
-                  <span data-feather="users"></span>
-                  Awardees
-                </a>
-              </li>
-              <li class="nav-item border-top">
-                <a class="nav-link {% if content_title == settings.CONTENT_TITLE.REPORTS %}active{% endif %}"  href="#">
-                  <span data-feather="bar-chart-2"></span>
-                  Reports
-                </a>
               </li>
                 {% endif %}
                 {% if request.user|has_group:'awardee' %}

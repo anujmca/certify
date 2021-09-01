@@ -71,12 +71,10 @@ def datasheets(request):
 @allowed_users(allowed_roles=[utl.Groups.issuer])
 def awardees(request):
     tenant_schema_name = connection.schema_name
-    awardee_list = None
-    with schema_context(settings.PUBLIC_SCHEMA_NAME):
-        awardee_group = Group.objects.get(name=utl.Groups.awardee)
-        awardee_list = list(
-            PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
-                'first_name', 'last_name'))
+    awardee_group = Group.objects.get(name=utl.Groups.awardee)
+    awardee_list = list(
+        PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
+            'first_name', 'last_name'))
     context = {'content_title': settings.CONTENT_TITLE.AWARDEES,
                'awardees': awardee_list}
     return render(request, 'awardees.html', context)
@@ -105,12 +103,13 @@ def my_certificates(request):
     from public.models import PublicCertificate
     tenant_schema_name = connection.schema_name
 
+    # with schema_context(settings.PUBLIC_SCHEMA_NAME):
     context = {'content_title': settings.CONTENT_TITLE.MY_CERTIFICATES,
                'certificates':
                    PublicCertificate.objects.filter(awardee=request.user).order_by('-created_on')
                    if tenant_schema_name == settings.PUBLIC_SCHEMA_NAME
                    else PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name,
-                                                         awardee=request.user).order_by('-created_on')
+                                                         awardee__id=request.user.public_user_id).order_by('-created_on')
                }
 
     return render(request, 'certificates\my-certificates.html', context)

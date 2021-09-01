@@ -121,3 +121,6 @@ class PublicCertificate(BaseModel2):
             event = Event.objects.get(pk=self.tenant_event_id)
 
         return event
+
+    def __str__(self):
+        return str(self.awardee) + ' - ' + self.event_name
