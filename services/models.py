@@ -64,20 +64,23 @@ class Template(BaseModel):
         thumbnail_file_path = utilities.get_jpg_file(self.file)
 
         if thumbnail_file_path is not None:
-            reopen = None
-            try:
-                # reopen = open(thumbnail_temp_file_path, 'rb')
-                # django_file = File(reopen)
-                # thumbnail_name = path_leaf(thumbnail_file_path)
-                # self.file_thumbnail.save(thumbnail_name, django_file, save=True)
-                # self.file_thumbnail.save(thumbnail_name, django_file, save=True)
-                self.file_thumbnail.name = thumbnail_file_path
-                super(Template, self).save(*args, **kwargs)
+            self.file_thumbnail.name = thumbnail_file_path
+            super(Template, self).save(*args, **kwargs)
 
-            finally:
-                if reopen:
-                    reopen.close()
-                # os.remove(thumbnail_file_path)
+            # reopen = None
+            # try:
+            #     # reopen = open(thumbnail_temp_file_path, 'rb')
+            #     # django_file = File(reopen)
+            #     # thumbnail_name = path_leaf(thumbnail_file_path)
+            #     # self.file_thumbnail.save(thumbnail_name, django_file, save=True)
+            #     # self.file_thumbnail.save(thumbnail_name, django_file, save=True)
+            #     self.file_thumbnail.name = thumbnail_file_path
+            #     super(Template, self).save(*args, **kwargs)
+            #
+            # finally:
+            #     if reopen:
+            #         reopen.close()
+            #     # os.remove(thumbnail_file_path)
 
 
 class DataSheet(BaseModel):
