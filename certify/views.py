@@ -71,10 +71,18 @@ def datasheets(request):
 @allowed_users(allowed_roles=[utl.Groups.issuer])
 def awardees(request):
     tenant_schema_name = connection.schema_name
+    # with schema_context(settings.PUBLIC_SCHEMA_NAME):
     awardee_group = Group.objects.get(name=utl.Groups.awardee)
-    awardee_list = list(
-        PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
-            'first_name', 'last_name'))
+    # awardee_list = list(
+    #     PublicUser.objects.filter(tenant_schema_name=tenant_schema_name, groups__in=[awardee_group]).order_by(
+    #         'first_name', 'last_name'))
+    # awardee_list = set([c.awardee for c in PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name)])
+    awardee_list = []
+    with schema_context(settings.PUBLIC_SCHEMA_NAME):
+        for pu in PublicUser.objects.all():
+            if pu.get_tenant_specific_certificates(tenant_schema_name).exists():
+                awardee_list.append(pu)
+
     context = {'content_title': settings.CONTENT_TITLE.AWARDEES,
                'awardees': awardee_list}
     return render(request, 'awardees.html', context)

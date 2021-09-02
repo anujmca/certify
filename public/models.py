@@ -81,7 +81,7 @@ class PublicUser(BaseUserModel):
 
 
 class PublicCertificate(BaseModel2):
-    awardee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="public_certificates")
+    awardee = models.ForeignKey(PublicUser, on_delete=models.CASCADE, related_name="public_certificates")
     event_name = models.CharField(max_length=128, null=False, blank=False)
     sms_available = models.BooleanField(null=False, blank=False, default=False)
     email_available = models.BooleanField(null=False, blank=False, default=False)

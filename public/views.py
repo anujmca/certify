@@ -24,11 +24,6 @@ def public_certificate_download(request, pk):
 @public
 def public_certificate_view_raw(request, pk):
     certificate = PublicCertificate.objects.get(pk=pk)
-    # filename = path_leaf(certificate.file.name)
-    # response = HttpResponse(certificate.file,
-    #                         content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
-    # response['Content-Disposition'] = 'inline; filename=%s' % filename
-
     response = FileResponse(open(certificate.file.name, 'rb'), content_type='application/pdf')
 
     return response
@@ -36,12 +31,6 @@ def public_certificate_view_raw(request, pk):
 @public
 def public_certificate_view(request, pk):
     certificate = PublicCertificate.objects.get(pk=pk)
-    filename = path_leaf(certificate.file.name)
-    # response = HttpResponse(certificate.file,
-    #                         content_type='application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation')
-    # response['Content-Disposition'] = 'attachment; filename=%s' % filename
-    # # TODO: Add logic to render certificate on UI
-    # return response
     context = {'content_title': 'Authorised Certificate',
                'certificate': certificate}
     return render(request, 'unauthenticated/certificate_view.html', context=context)
