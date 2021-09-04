@@ -1,7 +1,9 @@
 {% load static %}
+{% load tags %}
+{% get_tenant as tenant %}
 <!doctype html>
 <html lang="en">
-    <head>
+  <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -91,7 +93,13 @@
     <main class="form-signin">
       <form method="post" action="/services/login{% if next is not None %}?next={{ next }}{% endif %}">
         {% csrf_token %}
-        <img class="mb-4" src="../static/img/logo_big.png" alt="" width="72" height="57">
+        {% if tenant and tenant.logo %}
+            <img title="{{ tenant.name }}" src="{{ MEDIA_URL }}{{ tenant.logo }}" alt="{%  tenant_name %}" height="45px;" style="margin-bottom:10px;">
+        {% else %}
+            <img src="../static/img/logo_big.png" alt="" width="72" height="57">
+            <h2>{% tenant_name %}</h2>
+        {% endif %}
+
         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
         <div class="form-floating">
@@ -139,7 +147,7 @@
         </div>
         {% endif %}
       </form>
-        <p class="mt-5 mb-3 text-muted">&copy; 2021–2022</p>
+      <p class="mt-5 mb-3 text-muted">&copy; 2021–2022</p>
     </main>
   </body>
 </html>
