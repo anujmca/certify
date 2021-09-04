@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% load static %}
+{% load static %}
+<script src="{% static 'js/certificate-generate.js' %}"></script>
 
+{% csrf_token %}
 <table class="table table-striped">
   <thead>
     <tr>
@@ -9,7 +11,8 @@
       <th scope="col">Template</th>
       <th scope="col">Batch ID</th>
       <th scope="col">Data Keys</th>
-      <th scope="col">Certificate</th>
+      <th scope="col" class="text-center">Certificate</th>
+      <th scope="col" class="text-center">Action</th>
     </tr>
   </thead>
   <tbody>
@@ -23,10 +26,20 @@
               {{ data_key.name }}: {{ data_key.value }}{% if not forloop.last %},{% endif %}
           {% endfor %}
       </td>
-      <td>
-{#          <a href="/services/certificates/download/{{ certificate.file }}">#}
-{#              {{ certificate.file }}</a>#}
-          <a href="{{ MEDIA_URL }}{{ certificate.file }}" download>{{ certificate.file }}</a>
+      <td class="text-center">
+          {% if certificate.status != 'PB' %}
+            <a href="{{ MEDIA_URL }}{{ certificate.file }}" download><span data-feather="download"></span></a>
+          {% else %}
+              Published
+          {% endif %}
+      </td>
+      <td class="text-center">
+          {% if certificate.status == 'PB' %}
+              <a href="{% url 'public_certificate_download' certificate.public_certificate.id %}" download data-toggle="tooltip" title="Download"><span data-feather="download"></span></a>
+              <a href="{% url 'public_certificate_view' certificate.public_certificate.id %}" data-toggle="tooltip" title="View" target="_blank"><span data-feather="eye"></span></a>
+          {% else %}
+              <a href="javascript:publish_certificate({{ certificate.id }})" class="btn btn-primary"  data-toggle="tooltip" title="Publish this certificate">Publish</a>
+          {% endif %}
       </td>
     </tr>
     {% endfor %}
@@ -35,4 +48,21 @@
 
 {#    {% load render_table from django_tables2 %}#}
 {#    {% render_table table %}#}
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       </div>
+       <div class="modal-body">
+         Certificates published successfully
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
 {% endblock %}

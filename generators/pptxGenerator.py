@@ -13,9 +13,14 @@ def generate(template_file_path, data_sheet_dictionary):
     ppt = Presentation(template_file_path)
     slide = ppt.slides[0]
     for shape in ppt.slides[0].shapes:
-        if hasattr(shape, 'text') and shape.text.lower() in data_sheet_dictionary:
+        if hasattr(shape, 'text') and shape.text[1:-1].lower() in data_sheet_dictionary:
             # shape.text = data_sheet_dictionary[shape.text.lower()]
-            shape.text_frame.paragraphs[0].runs[0].text = data_sheet_dictionary[shape.text.lower()]
+
+            shape.text_frame.paragraphs[0].runs[0].text = data_sheet_dictionary[shape.text[1:-1].lower()]
+
+            if len(shape.text_frame.paragraphs[0].runs) > 1:
+                for index in range(1, len(shape.text_frame.paragraphs[0].runs), 1):
+                    shape.text_frame.paragraphs[0].runs[index].text = ''
 
             # ppt.save(data_sheet_dictionary['employee_name'] + ".pptx")
     return ppt

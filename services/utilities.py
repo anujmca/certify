@@ -48,7 +48,7 @@ def get_ppt_tokens(template_file):
     ppt = Presentation(template_file)
     slide = ppt.slides[0]
     for shape in ppt.slides[0].shapes:
-        if hasattr(shape, 'text'):
+        if hasattr(shape, 'text') and shape.text.startswith('{') and shape.text.endswith('}'):
             tokens.append(shape.text)
 
     tokens.sort()
@@ -78,26 +78,47 @@ from win32com.client import Dispatch
 import pythoncom
 from django.db import models
 from django.core.files import File
+import shutil
+from django.core.files.storage import default_storage as storage
+
 
 def get_jpg_file(file):
     ppt_dispatch = None
-    temp_thumbnail_path = None
+    prs = None
+    thumbnail_file_path = None
+    temp_ppt_file_path = None
     try:
+        read_only = True
+        has_title = False
+        window = False
+        unique_seed = str(uuid.uuid1())
+
+        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_ppt_file_path = os.path.join(temp_dir, unique_seed + file.name.split('/')[-1])
+
+        shutil.copyfile(file.path, temp_ppt_file_path)
+
         pythoncom.CoInitialize()
         ppt_dispatch = Dispatch('Powerpoint.Application')
-        ppt_dispatch.Presentations.Open(file.path, WithWindow=0)
+        prs = ppt_dispatch.Presentations.Open(temp_ppt_file_path, read_only, has_title, WithWindow=0)
         firstSlideRange = ppt_dispatch.Presentations[0].Slides.Range([1])
-        unique_seed = str(uuid.uuid1())
+
         thumbnails_dir = os.path.join(settings.MEDIA_ROOT, 'templates', 'thumbnails')
         os.makedirs(thumbnails_dir, exist_ok=True)
-        temp_thumbnail_path = os.path.join(thumbnails_dir, file.name.split('/')[-1].split('.')[0] + "_" + unique_seed + ".jpg")
-        firstSlideRange.Export(temp_thumbnail_path, 'JPG')
-    except:
-        temp_thumbnail_path = None
+        thumbnail_file_path = os.path.join(thumbnails_dir, file.name.split('/')[-1].split('.')[0] + "_" + unique_seed + ".jpg")
+        firstSlideRange.Export(thumbnail_file_path, 'JPG')
+    except Exception as ex:
+        thumbnail_file_path = None
     finally:
+        if prs:
+            prs.Close()
         if ppt_dispatch:
             ppt_dispatch.Quit()
-    return temp_thumbnail_path
+        if temp_ppt_file_path and os.path.exists(temp_ppt_file_path):
+            os.remove(temp_ppt_file_path)
+
+    return thumbnail_file_path
 
 
 def convert_ppt_to_pdf(ppt, pdf_filename):

@@ -136,7 +136,7 @@ class Event(BaseModel):
                 #     status = settings.EVENT_STATUS.PENDING_PAYMENT
                 elif not set(utilities.DEFAULT_TOKENS).issubset(set(self.datasheet.tokens)):
                     status = settings.EVENT_STATUS.INVALID_DATA_KEYS
-                elif not set(self.template.tokens).issubset(set(self.datasheet.tokens)):
+                elif not set([t[1:-1] for t in self.template.tokens]).issubset(set(self.datasheet.tokens)):
                     status = settings.EVENT_STATUS.MISMATCHING_KEYS
                 else:
                     status = settings.EVENT_STATUS.READY_TO_GENERATE
@@ -147,6 +147,10 @@ class Event(BaseModel):
     @property
     def certificate_generated_count(self):
         return 0 if self.certificates is None else self.certificates.count()
+
+    @property
+    def certificate_published_count(self):
+        return 0 if self.certificates is None else self.certificates.filter(status=Certificate.STATUSES.PUBLISHED).count()
 
     @property
     def sms_available_count(self):
@@ -179,6 +183,7 @@ class Certificate(BaseModel):
     email_available = models.BooleanField(null=False, blank=False, default=False)
     sms_sent = models.BooleanField(null=False, blank=False, default=False)
     email_sent = models.BooleanField(null=False, blank=False, default=False)
+    public_certificate_id = models.BigIntegerField(null=True, blank=True, default=None)
     status = models.CharField(
         max_length=2,
         choices=STATUSES.choices,
@@ -188,6 +193,9 @@ class Certificate(BaseModel):
     file = models.FileField(
         upload_to='certificates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/certificates/2015/01/30
 
+    def __str__(self):
+        return str((self.awardee if self.awardee else '')) + ' - ' + self.file.name
+
     @property
     def awardee(self):
         result = None
@@ -196,6 +204,17 @@ class Certificate(BaseModel):
                 result = UserModel.objects.get(pk=self.awardee_public_id)
 
         return result
+
+    @property
+    def public_certificate(self):
+        result = None
+        if self.public_certificate_id is not None and self.public_certificate_id > 0:
+            with schema_context(settings.PUBLIC_SCHEMA_NAME):
+                from public.models import PublicCertificate
+                result = PublicCertificate.objects.get(pk=self.public_certificate_id)
+
+        return result
+
 # import django_tables2 as tables
 #
 # class CertificateTable(tables.Table):

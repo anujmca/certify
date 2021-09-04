@@ -99,7 +99,7 @@ class PublicCertificate(BaseModel2):
     @property
     def tenant(self):
         from tenant.models import Client
-        return Client.objects.get(name=self.tenant_schema_name)
+        return Client.objects.get(schema_name=self.tenant_schema_name)
 
     @property
     def awarded_to(self):

@@ -14,8 +14,7 @@
       <th scope="col">Issued On</th>
       <th scope="col">SMS</th>
       <th scope="col">Email</th>
-      <th scope="col">Certificate</th>
-      <th scope="col">Share</th>
+      <th scope="col" class="text-center">Certificate</th>
     </tr>
   </thead>
   <tbody>
@@ -23,7 +22,7 @@
     {% for certificate in certificates %}
     <tr>
       <th scope="row">{{ certificate.id }}</th>
-      <td>{{ certificate.tenant }}</td>
+      <td>{{ certificate.tenant.name }}</td>
       <td>{{ certificate.event.name }}</td>
       <td>{{ certificate.event.awarded_by }}</td>
       <td>{{ certificate.created_on|date:settings.DATE_FORMAT }}</td>
@@ -47,14 +46,10 @@
           {% endif %}
           <div><a href="javascript:send_email({{ certificate.id }})">Resend</a></div>
       </td>
-      <td>
-{#          <a href="{{ MEDIA_URL }}{{ certificate.file }}" download class="btn btn-primary">Download</a>#}
-          <a href="{% url 'public_certificate_download' certificate.id %}" download class="btn btn-primary">Download</a>
-      </td>
-      <td>
-          <a href="javascript:public_certificate_copy_to_clipboard({{ certificate.id }})" download class="cursor-hand" data-toggle="tooltip" title="Copy to clipboard">
-              <span data-feather="copy" ></span>
-          </a>
+      <td class="text-center">
+          <a href="{% url 'public_certificate_download' certificate.id %}" download data-toggle="tooltip" title="Download" class="margin-left-right-5"><span data-feather="download"></span></a>
+          <a href="{% url 'public_certificate_view' certificate.id %}" data-toggle="tooltip" title="View" target="_blank" class="margin-left-right-5"><span data-feather="eye"></span></a>
+          <a href="javascript:public_certificate_copy_to_clipboard({{ certificate.id }})" data-toggle="tooltip" title="Copy public url to clipboard" class="margin-left-right-5"><span data-feather="copy" ></span></a>
       </td>
     </tr>
     {% endfor %}

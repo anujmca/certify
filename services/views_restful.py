@@ -387,52 +387,74 @@ def generate_certificate(request):
 @allowed_users(allowed_roles=[utl.Groups.issuer])
 @api_view(['POST'])
 # @csrf_exempt
-def publish_certificate(request):
+def publish_certificates(request):
     event_id = request.POST.get('event_id')
     event = Event.objects.get(pk=event_id)
     if event.status == settings.EVENT_STATUS.CERTIFICATE_GENERATED and event.certificates:
         for certificate in event.certificates.filter(status=Certificate.STATUSES.UNPUBLISHED):
-            if certificate.awardee is not None:
-                awardee = certificate.awardee
-                event_name = certificate.event.name
-                sms_available = certificate.sms_available
-                email_available = certificate.email_available
-                file = certificate.file
-                tenant_schema_name = connection.schema_name
-                awarded_by_user_id = certificate.created_by.id
-                tenant_event_id = certificate.event.id
-
-                with schema_context(settings.PUBLIC_SCHEMA_NAME):
-                    if not PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name, awardee=awardee, tenant_event_id=tenant_event_id).exists():
-                        public_certificate = PublicCertificate(awardee=awardee, event_name=event_name,
-                                                               sms_available=sms_available, email_available=email_available,
-                                                               file=file
-                                                               )
-                        public_certificate.tenant_schema_name = tenant_schema_name
-                        public_certificate.awarded_by_user_id = awarded_by_user_id
-                        public_certificate.tenant_event_id = tenant_event_id
-
-                        public_certificate.save()
-
-                        # TODO: send email/sms here
-                        # if password is not None:
-                        # send the password also in that email
-
-                # Todo: in case this awardee is also a user in this tenant, then assign the tenant user as "Awardee" role
-
-                if awardee is not None:
-                    tenant_user = get_tenant_user_by_public_user(User.objects, awardee)
-                    if tenant_user is not None and tenant_user.public_user_id is None:
-                        tenant_user.public_user_id = awardee.id
-                        assign_awardee_group(tenant_user)
-                        tenant_user.save()
-
-                certificate.status = Certificate.STATUSES.PUBLISHED
-                certificate.save()
+            publish_individual_certificate(certificate)
         data = {'id': event.id, 'result': 'success'}
         return Response(data=data, status=status.HTTP_200_OK)
     else:
         data = {'id': event.id, 'result': 'failure'}
         return Response(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@login_required
+@allowed_users(allowed_roles=[utl.Groups.issuer])
+@api_view(['POST'])
+# @csrf_exempt
+def publish_certificate(request, pk):
+    try:
+        certificate = Certificate.objects.get(pk=pk)
+        publish_individual_certificate(certificate)
+        data = {'id': pk, 'result': 'success'}
+        return Response(data=data, status=status.HTTP_200_OK)
+    except Exception as ex:
+        data = {'id': pk, 'result': 'failure'}
+        return Response(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR, error=str(ex))
+
+def publish_individual_certificate(certificate):
+    if certificate.awardee is not None:
+        awardee = certificate.awardee
+        event_name = certificate.event.name
+        sms_available = certificate.sms_available
+        email_available = certificate.email_available
+        file = certificate.file
+        tenant_schema_name = connection.schema_name
+        awarded_by_user_id = certificate.created_by.id
+        tenant_event_id = certificate.event.id
+        public_certificate_id = None
+
+        with schema_context(settings.PUBLIC_SCHEMA_NAME):
+            if not PublicCertificate.objects.filter(tenant_schema_name=tenant_schema_name, awardee=awardee,
+                                                    tenant_event_id=tenant_event_id).exists():
+                public_certificate = PublicCertificate(awardee=awardee, event_name=event_name,
+                                                       sms_available=sms_available, email_available=email_available,
+                                                       file=file
+                                                       )
+                public_certificate.tenant_schema_name = tenant_schema_name
+                public_certificate.awarded_by_user_id = awarded_by_user_id
+                public_certificate.tenant_event_id = tenant_event_id
+
+                public_certificate.save()
+                public_certificate_id = public_certificate.id
+
+                # TODO: send email/sms here
+                # if password is not None:
+                # send the password also in that email
+
+        # Todo: in case this awardee is also a user in this tenant, then assign the tenant user as "Awardee" role
+
+        if awardee is not None:
+            tenant_user = get_tenant_user_by_public_user(User.objects, awardee)
+            if tenant_user is not None and tenant_user.public_user_id is None:
+                tenant_user.public_user_id = awardee.id
+                assign_awardee_group(tenant_user)
+                tenant_user.save()
+
+        certificate.status = Certificate.STATUSES.PUBLISHED
+        certificate.public_certificate_id = public_certificate_id
+        certificate.save()
 
 # endregion

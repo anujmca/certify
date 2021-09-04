@@ -14,11 +14,14 @@ from services.decorators import unauthenticated_user, allowed_users, public
 # Create your views here.
 
 def update_download_counter(certificate, request):
-    if request.user == certificate.awardee:
-        certificate.download_by_awardee_count += 1
-    else:
-        certificate.download_by_public_count += 1
-    certificate.save()
+    try:
+        if request.user == certificate.awardee:
+            certificate.download_by_awardee_count += 1
+        else:
+            certificate.download_by_public_count += 1
+        certificate.save()
+    except Exception as ex:
+        print(str(ex))
 
 
 @public
@@ -48,6 +51,7 @@ def public_certificate_download(request, pk):
     update_download_counter(certificate, request)
     return response
 
+
 @public
 def public_certificate_view_raw(request, pk):
     certificate = PublicCertificate.objects.get(pk=pk)
@@ -56,11 +60,12 @@ def public_certificate_view_raw(request, pk):
     update_download_counter(certificate, request)
     return response
 
+
 @public
 def public_certificate_view(request, pk):
     certificate = PublicCertificate.objects.get(pk=pk)
     context = {'content_title': 'Authorised Certificate',
                'certificate': certificate}
 
-    update_download_counter(certificate, request)
+    # update_download_counter(certificate, request)
     return render(request, 'unauthenticated/certificate_view.html', context=context)
