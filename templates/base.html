@@ -1,6 +1,7 @@
 {% load static %}
 {% load tags %}
 {% load filters %}
+{% get_tenant as tenant %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,8 +36,14 @@
     <link href="{% static 'css/dashboard.css'%}" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">{%  tenant_name %}</a>
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow" style="vertical-align: middle">
+      <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#" style="padding-top:0px;padding-bottom:0px;vertical-align: middle;height:45px;display : flex;  align-items : center;">
+          {% if tenant and tenant.logo %}
+            <img src="{{ MEDIA_URL }}{{ tenant.logo }}" alt="{%  tenant_name %}" height="45px;">
+          {% else %}
+            {%  tenant_name %}
+          {% endif %}
+      </a>
       <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

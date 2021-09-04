@@ -10,3 +10,10 @@ def tenant_name(context):
     request = context['request']
     tenant = utilities.get_tenant(request)
     return settings.OUR_DISPLAY_NAME if tenant is None else tenant.name
+
+
+@register.simple_tag(takes_context=True)
+def get_tenant(context):
+    request = context['request']
+    tenant_obj = utilities.get_tenant(request)
+    return tenant_obj

@@ -2,8 +2,13 @@ from django.db import models
 from django_tenants.models import TenantMixin, DomainMixin
 
 
+def get_client_logo_folder(self, file_name):
+    return f'clients/{self.name}/logo/{file_name}'
+
+
 class Client(TenantMixin):
     name = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to=get_client_logo_folder, null=True, blank=True, default=None)
     # paid_until =  models.DateField()
     # on_trial = models.BooleanField()
     # created_on = models.DateField(auto_now_add=True)
