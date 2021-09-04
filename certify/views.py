@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from public.models import PublicCertificate, PublicUser
@@ -38,9 +38,31 @@ def index(request):
         context = {'content_title': settings.CONTENT_TITLE.DASHBOARD}
 
         if utl.Groups.issuer in utl.get_user_group_names(request.user):
+            templates_total = Template.objects.count()
+            templates_used = Event.objects.values('template').distinct().count()
+
+            events_total = Event.objects.count()
+            events_generated = Event.objects.filter(are_certificates_generated=True).count()
+
+            certificates_total = Certificate.objects.count()
+            certificates_published = Certificate.objects.filter(status=Certificate.STATUSES.PUBLISHED).count()
+
+            awardee_total = len(get_awardees())
+            awardee_downloaded = 0
+
+            with schema_context(settings.PUBLIC_SCHEMA_NAME):
+                awardee_downloaded = PublicCertificate.objects.filter(download_by_awardee_count__gt=0).values('awardee').distinct().count()
+
+            context = {**context, **{
+                'templates': {'used': templates_used, 'total': templates_total},
+                'events': {'generated': events_generated, 'total': events_total},
+                'certificates': {'published': certificates_published, 'total': certificates_total},
+                'awardee': {'downloaded': awardee_downloaded, 'total': awardee_total}
+                }
+            }
             return render(request, 'index.html', context)
         else:
-            return render(request, 'index-for-awardee.html', context)
+            return redirect('/public/dashboard')
 
 
 @login_required
@@ -70,6 +92,14 @@ def datasheets(request):
 @login_required
 @allowed_users(allowed_roles=[utl.Groups.issuer])
 def awardees(request):
+    awardee_list = get_awardees()
+
+    context = {'content_title': settings.CONTENT_TITLE.AWARDEES,
+               'awardees': awardee_list}
+    return render(request, 'awardees.html', context)
+
+
+def get_awardees():
     tenant_schema_name = connection.schema_name
     # with schema_context(settings.PUBLIC_SCHEMA_NAME):
     awardee_group = Group.objects.get(name=utl.Groups.awardee)
@@ -82,11 +112,18 @@ def awardees(request):
         for pu in PublicUser.objects.all():
             if pu.get_tenant_specific_certificates(tenant_schema_name).exists():
                 awardee_list.append(pu)
+    return awardee_list
 
-    context = {'content_title': settings.CONTENT_TITLE.AWARDEES,
-               'awardees': awardee_list}
-    return render(request, 'awardees.html', context)
-
+#
+# def get_published_certificates():
+#     tenant_schema_name = connection.schema_name
+#     awardee_group = Group.objects.get(name=utl.Groups.awardee)
+#     certificate_list = []
+#     with schema_context(settings.PUBLIC_SCHEMA_NAME):
+#         for pu in PublicCertificate.objects.all():
+#             if pu.get_tenant_specific_certificates(tenant_schema_name).exists():
+#                 awardee_list.append(pu)
+#     return awardee_list
 
 @login_required
 @allowed_users(allowed_roles=[utl.Groups.issuer])

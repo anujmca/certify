@@ -1,4 +1,48 @@
 {% extends 'base.html' %}
 {% block content %}
-        Dashboard for Issuer
+{% load static %}
+
+<link href="{% static 'css/public-dashboard.css'%}" rel="stylesheet">
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container bootstrap snippets bootdey">
+    <div class="row">
+        <div onclick="window.location='{% url 'templates' %}'" class="col-md-3 col-sm-6 col-xs-12 cursor-hand">
+            <div class="mini-stat clearfix bg-certificates rounded">
+                <span class="mini-stat-icon"><i class="fa fa-file fg-certificates"></i></span>
+                <div class="mini-stat-info">
+                    <span>{{ templates.used }}</span>
+                    Template Used Out of {{ templates.total }}
+                </div>
+            </div>
+        </div>
+        <div onclick="window.location='{% url 'certificates_generate' %}'" class="col-md-3 col-sm-6 col-xs-12 cursor-hand">
+            <div class="mini-stat clearfix bg-issuer rounded">
+                <span class="mini-stat-icon"><i class="fa fa-list fg-issuer"></i></span>
+                <div class="mini-stat-info">
+                    <span>{{ events.generated }}</span>
+                    Events Completed Out of {{ events.total }}
+                </div>
+            </div>
+        </div>
+        <div onclick="window.location='{% url 'certificates_generated' %}'" class="col-md-3 col-sm-6 col-xs-12 cursor-hand">
+            <div class="mini-stat clearfix bg-download rounded">
+                <span class="mini-stat-icon"><i class="fa fa-certificate fg-download"></i></span>
+                <div class="mini-stat-info">
+                    <span>{{ certificates.published }}</span>
+                    Certificates Published Out of {{ certificates.total }}
+                </div>
+            </div>
+        </div>
+        <div onclick="window.location='{% url 'awardees' %}'" class="col-lg-3 col-md-3 col-sm-6 col-xs-12 cursor-hand">
+            <div class="mini-stat clearfix bg-eye rounded">
+                <span class="mini-stat-icon"><i class="fa fa-download fg-eye"></i></span>
+                <div class="mini-stat-info">
+                    <span>{{ awardee.downloaded }}</span>
+                    Awardee Downloaded Out Of {{ awardee.total }}
+                </div>
+            </div>
+        </div>
+	</div>
+</div>
 {% endblock %}

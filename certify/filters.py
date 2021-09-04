@@ -21,6 +21,11 @@ def has_group(user, group_name):
 
 
 @register.filter
+def does_not_have_group(user, group_name):
+    return group_name not in utl.get_user_group_names(user)
+
+
+@register.filter
 def events(user):
     _events = [certificate.event for certificate in user.certificates.all()]
     return set(_events)
@@ -38,3 +43,15 @@ def tenant_specific_certificates(awardee):
     tenant_schema_name = connection.schema_name
     with schema_context(settings.PUBLIC_SCHEMA_NAME):
         return awardee.get_tenant_specific_certificates(tenant_schema_name=tenant_schema_name)
+
+
+@register.filter
+def certificate_by_template(template):
+    """
+
+    @type template: services.models.Template
+    """
+    certificates = []
+    for event in template.events.all():
+        certificates.append(event.certificates)
+    return certificates

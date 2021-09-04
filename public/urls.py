@@ -9,6 +9,7 @@ urlpatterns = [
     # path('login', views.login, name='login'),
     # path('logout', views.logout, name='logout'),
 
+    path('dashboard/', views.public_dashboard, name='public_dashboard'),
     path('certificates/', views_restful.PublicCertificateList.as_view()),
     path('certificates/<int:pk>/', views_restful.PublicCertificateDetail.as_view()),
     path('certificates/<int:pk>/view', views.public_certificate_view, name='public_certificate_view'),

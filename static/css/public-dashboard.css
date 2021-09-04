@@ -1,0 +1,88 @@
+/*body{*/
+/*    background:#eee;*/
+/*    margin-top:20px;*/
+/*}*/
+
+.rounded {
+  -webkit-border-radius: 3px !important;
+  -moz-border-radius: 3px !important;
+  border-radius: 3px !important;
+}
+
+.mini-stat {
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.mini-stat-icon {
+  width: 60px;
+  height: 60px;
+  display: inline-block;
+  line-height: 60px;
+  text-align: center;
+  font-size: 30px;
+  background: none repeat scroll 0% 0% #EEE;
+  border-radius: 100%;
+  float: left;
+  margin-right: 10px;
+  color: #FFF;
+}
+
+.mini-stat-info {
+  font-size: 12px;
+  padding-top: 2px;
+}
+
+span, p {
+  color: white;
+}
+
+.mini-stat-info span {
+  display: block;
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  margin-top: 7px;
+}
+
+/* ================ colors =====================*/
+.bg-certificates {
+  background-color: #3b5998 !important;
+  border: 1px solid #3b5998;
+  color: white;
+}
+
+.fg-certificates {
+  color: #3b5998 !important;
+}
+
+.bg-issuer {
+  background-color: #00a0d1 !important;
+  border: 1px solid #00a0d1;
+  color: white;
+}
+
+.fg-issuer {
+  color: #00a0d1 !important;
+}
+
+.bg-download {
+  background-color: #db4a39 !important;
+  border: 1px solid #db4a39;
+  color: white;
+}
+
+.fg-download {
+  color: #db4a39 !important;
+}
+
+.bg-eye {
+  background-color: #205081 !important;
+  border: 1px solid #205081;
+  color: white;
+}
+
+.fg-eye {
+  color: #205081 !important;
+}
+

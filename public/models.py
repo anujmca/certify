@@ -93,6 +93,9 @@ class PublicCertificate(BaseModel2):
     tenant_awarded_by_user_id = models.BigIntegerField(null=False, blank=False, default=0)
     tenant_event_id = models.BigIntegerField(null=False, blank=False, default=0)
 
+    download_by_awardee_count = models.BigIntegerField(null=True, blank=True, default=0)
+    download_by_public_count = models.BigIntegerField(null=True, blank=True, default=0)
+
     @property
     def tenant(self):
         from tenant.models import Client
