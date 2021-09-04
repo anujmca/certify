@@ -16,6 +16,13 @@ class PublicCertificateAdmin(admin.ModelAdmin):
 admin.site.register(PublicCertificate, PublicCertificateAdmin)
 
 
+class FreeTemplateAdmin(admin.ModelAdmin):
+    model = FreeTemplate
+
+
+admin.site.register(FreeTemplate, FreeTemplateAdmin)
+
+
 # class PublicProfileInline(admin.StackedInline):
 #     model = Profile
 #     can_delete = False

@@ -48,8 +48,8 @@ SHARED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'public',
     'common',
+    'public',
     'accounts',
 ]
 
@@ -60,13 +60,11 @@ TENANT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'common',
     'services',
     'django_tables2',
     # 'tenant'
-
     'rest_framework',
-    'common',
     'accounts',
 ]
 

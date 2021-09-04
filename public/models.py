@@ -2,7 +2,7 @@ from django.db import models
 from django_tenants.utils import schema_context
 from django.conf import settings
 
-from common.models import BaseModel2
+from common.models import BaseModel2, BaseTemplate
 
 User = settings.AUTH_USER_MODEL
 
@@ -124,3 +124,7 @@ class PublicCertificate(BaseModel2):
 
     def __str__(self):
         return str(self.awardee) + ' - ' + self.event_name
+
+
+class FreeTemplate(BaseTemplate):
+    pass

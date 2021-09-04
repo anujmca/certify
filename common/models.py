@@ -82,3 +82,27 @@ class BaseModel2(models.Model):
 #     otp = models.CharField(max_length=10, null=True, blank=True, unique=False, )
 #     otp_valid_till = models.DateTimeField(null=True, blank=True, editable=True, help_text="UTC Time")
 
+
+class BaseTemplate(BaseModel):
+    name = models.CharField(max_length=100, null=False, unique=True)
+    description = models.CharField(max_length=400, null=True)
+    file = models.FileField(upload_to='templates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/templates/2015/01/30
+    tokens = ArrayField(models.CharField(max_length=50), blank=True, null=True, default=None)
+    # pdf_file = models.FileField(upload_to='templates/%Y/%m/%d/')  # file will be saved to MEDIA_ROOT/templates/2015/01/30
+    # file_jpg = models.FileField(upload_to='templates/%Y/%m/%d/', blank=True, null=True)  # file will be saved to MEDIA_ROOT/templates/2015/01/30
+    file_thumbnail = models.FileField(upload_to='templates/thumbnails/%Y/%m/%d/', blank=True, null=True, max_length=500)  # file will be saved to MEDIA_ROOT/templates/thumbnails/2015/01/30
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        thumbnail_file_path = utilities.get_jpg_file(self.file)
+        if thumbnail_file_path is not None:
+            self.file_thumbnail.name = thumbnail_file_path
+            # super(BaseTemplate, self).save(*args, **kwargs)
+
+        self.tokens = utilities.get_ppt_tokens(self.file)
+        super(BaseTemplate, self).save(*args, **kwargs)
