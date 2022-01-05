@@ -10,6 +10,8 @@ from django.conf import settings
 import services.utilities as utl
 from django_tenants.utils import schema_context, connection
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext as _
+
 
 User = get_user_model()
 

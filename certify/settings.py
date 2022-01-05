@@ -84,6 +84,7 @@ MIDDLEWARE = [
     'certify.middleware.CustomAuthenticationBackend',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -211,7 +212,7 @@ CONTENT_TITLE = SimpleNamespace(**{
 })
 
 EVENT_STATUS = SimpleNamespace(**{
-    'PENDING_TEMPLATE': 'Template Pending', # Just the name and descriptions are added
+    'PENDING_TEMPLATE': 'Template Pending',  # Just the name and descriptions are added
     'PENDING_DATASHEET': 'Data Sheet Pending',
     'PENDING_PAYMENT': 'Payment Pending',
     'MISMATCHING_KEYS': 'Mismatching Keys',
@@ -243,3 +244,25 @@ REST_FRAMEWORK = {
 }
 # APPEND_SLASH = True
 
+
+# region Internationalization
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('fr', _('French')),
+    ('hi', _('Hindi')),
+    ('ja', _('Japanese')),
+    ('ar', _('Arabic')),
+)
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale/'),
+)
+# endregion

@@ -1,0 +1,115 @@
+Privacy policy
+
+
+-- Recent (15 days) activity done
+   Last 5 campaign - high level summary - go to details as well
+   News from platform
+	    New free templates
+		Change in pricing
+		Upgrade to pro, if free.
+
+
+Objective - 
+-- To help companies or individuals to create and deliver Certificate for an event to awardees, digitally, with ease. And have machanism to Monitor the acceptance of the certificate. 
+-- The certificates will be authenticable using block/chain 
+-- 
+
+
+ 
+Create and deliver
+-- "Certificate" for an "Event" to "awardees" 
+
+Issuer should be able to create an Event 
+Issuer should be able to create Certificate
+	- Create Certificate Template 
+	   Upload and Edit Templates with graphics and text place holders 
+	     Using JPG
+		 Using PPT
+		  
+	   Reuse old templates
+	   
+	- Generate Certificate for all 1 or many awardees
+		Provided via data entry - form, by awardees (self) or by the issuer
+		selection from address book 
+		uploaded as a list -- done
+		
+		
+Issuer should be able to deliver the certificate to 1 or many awardee digitally
+
+Issuer should be able to check the status of delivery to the awardees
+
+Issuer will get notification for change/correction request for error/omission in the certificates
+
+
+
+
+-----
+
+Awardee will get a link with the details of the "certificate" awarded for the "event"
+Awardee will be able to click onthe link and download the certificate or login in to their area to see/download the certificates
+In their area, they will be able to see certificates awarded to them for events by other issuers as well.
+Awardee can request for ractification for error/omisions in the certificates
+
+
+
+------
+
+
+Any public with the certificate file can validate the authenticity of the certificate by uploading the file and the awardee "code" and 
+optinally get how many other awardee were there for the same event
+
+
+
+
+System will return wheather this certificate was awarded to same awardee and with same file. Optinnally it will return how many other awardee were there for the same event
+
+
+--
+
+Issuer can communiate to past awardees of all/selected events held within certain "time frame"
+
+
+------
+
+
+
+
+
+for website --
+
+Why Digital Certificate
+How it works
+FAQ
+Pricing
+- Free tier
+- Paid Plans
+
+
+
+
+
+
+
+
+----------------
+
+Menu - left
+
+Dashboard
+Events
+  Event Dashboard
+  Create event
+    Event information
+    select/upload template
+	select/updload list of awardees
+	Current Events
+    Deliver
+	Awardees 
+  Past Events - all
+  
+  
+  
+  Setup an Event
+  
+ 
+   
